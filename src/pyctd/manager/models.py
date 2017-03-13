@@ -1,18 +1,23 @@
 # -*- coding: utf-8 -*-
+"""SQLAlchemy database models in this module describes all tables the database and 
+fits the description in the table_conf module"""
 
-from sqlalchemy import Column, ForeignKey, Table, UniqueConstraint
-from sqlalchemy import Integer, String, Float, Text
+from sqlalchemy import Column, ForeignKey
+from sqlalchemy import Integer, String, Text, REAL
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import relationship
-
-from sqlalchemy.schema import UniqueConstraint
+from .defaults import TABLE_PREFIX
 
 Base = declarative_base()
 
-TABLE_PREFIX = 'pyctd_'
-
 
 def foreign_key_to(table_name):
+    """Creates a standard foreign key to a table in the database
+    
+    :param table_name: name of the table without TABLE_PREFIX
+    :type table_name: str
+    :return: foreign key column 
+    :rtype: sqlalchemy.Column
+    """
     foreign_column = TABLE_PREFIX + table_name + '.id'
     return Column(Integer, ForeignKey(foreign_column))
 
@@ -30,8 +35,8 @@ class Pathway(Base):
 
 class Action(Base):
     __tablename__ = TABLE_PREFIX + "action"
-
     id = Column(Integer, primary_key=True)
+
     type_name = Column(String(255))
     code = Column(String(255))
     description = Column(String(255))
@@ -47,22 +52,43 @@ class Chemical(Base):
 
     chemical_name = Column(String(255))
     chemical_id = Column(String(255))
-    casrn = Column(String(255))
+    cas_rn = Column(String(255))
     definition = Column(Text)
-    parent_ids = Column(String(255))
-    tree_numbers = Column(Text)
-    parent_tree_numbers = Column(Text)
 
     def __repr__(self):
         return self.chemical_name
 
 
-class ChemicalDrugbank(Base):
-    __tablename__ = TABLE_PREFIX + "chemical__drugbank"
+class ChemicalParentid(Base):
+    __tablename__ = TABLE_PREFIX + "chemical__parent_id"
     id = Column(Integer, primary_key=True)
 
     chemical__id = foreign_key_to('chemical')
-    drugbank_id = Column(Integer)
+    parent_id = Column(String(255))
+
+
+class ChemicalTreenumber(Base):
+    __tablename__ = TABLE_PREFIX + "chemical__tree_number"
+    id = Column(Integer, primary_key=True)
+
+    chemical__id = foreign_key_to('chemical')
+    tree_number = Column(String(255))
+
+
+class ChemicalParenttreenumber(Base):
+    __tablename__ = TABLE_PREFIX + "chemical__parent_tree_number"
+    id = Column(Integer, primary_key=True)
+
+    chemical__id = foreign_key_to('chemical')
+    parent_tree_number = Column(String(255))
+
+
+class ChemicalDrugbank(Base):
+    __tablename__ = TABLE_PREFIX + "chemical__drugbank_id"
+    id = Column(Integer, primary_key=True)
+
+    chemical__id = foreign_key_to('chemical')
+    drugbank_id = Column(String(255))
 
 
 class ChemicalSynonym(Base):
@@ -131,6 +157,7 @@ class GeneAltGeneId(Base):
     gene__id = foreign_key_to('gene')
     alt_gene_id = Column(Integer)
 
+
 class GenePharmgkb(Base):
     __tablename__ = TABLE_PREFIX + "gene__pharmgkb_id"
     id = Column(Integer, primary_key=True)
@@ -169,43 +196,47 @@ class ChemicalDisease(Base):
 
     direct_evidence = Column(String(255))
     inference_gene_symbol = Column(String(255))
-    inference_score = Column(Float)
+    inference_score = Column(REAL)
     chemical__id = foreign_key_to('chemical')
     disease__id = foreign_key_to('disease')
 
 
 class ChemicalDiseaseOmim(Base):
-    __tablename__ = TABLE_PREFIX + "chemical__disease__omim"
+    __tablename__ = TABLE_PREFIX + "chemical__disease__omim_id"
     id = Column(Integer, primary_key=True)
 
     chemical__disease__id = foreign_key_to('chemical__disease')
     omim_id = Column(Integer)
 
 
-class ChemPathwayEnriched(Base):
-    __tablename__ = TABLE_PREFIX + "chem_pathway_enriched"
+class ChemicalDiseasePubmedid(Base):
+    __tablename__ = TABLE_PREFIX + "chemical__disease__pubmed_id"
     id = Column(Integer, primary_key=True)
 
-    pathway_name = Column(String(255))
-    pathway_id = Column(Text)
-    p_value = Column(String(255))
-    corrected_p_value = Column(String(255))
-    target_match_qty = Column(Text)
-    target_total_qty = Column(Text)
-    background_match_qty = Column(Text)
+    chemical__disease__id = foreign_key_to('chemical__disease')
+    pubmed_id = Column(Integer)
+
+
+class ChemPathwayEnriched(Base):
+    __tablename__ = TABLE_PREFIX + "chem__pathway_enriched"
+    id = Column(Integer, primary_key=True)
+
+    p_value = Column(REAL)
+    corrected_p_value = Column(REAL)
+    target_match_qty = Column(Integer)
+    target_total_qty = Column(Integer)
+    background_match_qty = Column(Integer)
     background_total_qty = Column(Integer)
     chemical__id = foreign_key_to('chemical')
-
-    def __repr__(self):
-        return self.pathway_name
+    pathway__id = foreign_key_to('pathway')
 
 
 class ChemGeneIxn(Base):
+    """Chemical–gene interactions"""
+
     __tablename__ = TABLE_PREFIX + "chem_gene_ixn"
     id = Column(Integer, primary_key=True)
 
-    gene_forms = Column(Text)
-    organism = Column(String(255))
     organism_id = Column(Integer)
     interaction = Column(Text)
     chemical__id = foreign_key_to('chemical')
@@ -216,6 +247,8 @@ class ChemGeneIxn(Base):
 
 
 class ChemGeneIxnGeneForm(Base):
+    """Chemical–gene interactions gene forms"""
+
     __tablename__ = TABLE_PREFIX + "chem_gene_ixn__gene_form"
     id = Column(Integer, primary_key=True)
 
@@ -227,19 +260,19 @@ class ChemGeneIxnGeneForm(Base):
 
 
 class ChemGeneIxnInteractionAction(Base):
-    __tablename__ = TABLE_PREFIX + "chem_gene_ixn_interaction_action"
+    """Chemical–gene interactions actions"""
+
+    __tablename__ = TABLE_PREFIX + "chem_gene_ixn__interaction_action"
     id = Column(Integer, primary_key=True)
 
     chem_gene_ixn__id = foreign_key_to('chem_gene_ixn')
-    interaction = Column(String(255))
-    action = Column(String(255))
-
-    def __repr__(self):
-        return '{}:{}'.format(self.interaction)
+    interaction_action = Column(String(255))
 
 
 class ChemGeneIxnPubmed(Base):
-    __tablename__ = TABLE_PREFIX + "chem_gene_ixn__pubmed"
+    """Chemical–gene interactions PubMed links"""
+
+    __tablename__ = TABLE_PREFIX + "chem_gene_ixn__pubmed_id"
     id = Column(Integer, primary_key=True)
 
     chem_gene_ixn__id = foreign_key_to('chem_gene_ixn')
@@ -250,34 +283,25 @@ class ChemGeneIxnPubmed(Base):
 
 
 class ChemGoEnriched(Base):
-    __tablename__ = TABLE_PREFIX + "chem_go_enriched"
+    """Chemical–GO enriched associations"""
+
+    __tablename__ = TABLE_PREFIX + "chem__go_enriched"
     id = Column(Integer, primary_key=True)
 
     ontology = Column(String(255))
     go_term_name = Column(String(255))
     go_term_id = Column(String(255))
     highest_go_level = Column(Integer)
-    p_value = Column(String(255))
-    corrected_p_value = Column(String(255))
-    target_match_qty = Column(String(255))
-    target_total_qty = Column(Text)
-    background_match_qty = Column(Text)
+    p_value = Column(REAL)
+    corrected_p_value = Column(REAL)
+    target_match_qty = Column(Integer)
+    target_total_qty = Column(Integer)
+    background_match_qty = Column(Integer)
     background_total_qty = Column(Integer)
     chemical__id = foreign_key_to('chemical')
 
     def __repr__(self):
         return self.go_term_name
-
-
-class ChemicalDiseasePubmed(Base):
-    __tablename__ = TABLE_PREFIX + "chemical__disease__pubmed"
-    id = Column(Integer, primary_key=True)
-
-    chemical__disease__id = foreign_key_to('chemical__disease')
-    pubmed_id = Column(Integer)
-
-    def __repr__(self):
-        return self.pubmed_id
 
 
 class DiseasePathway(Base):
@@ -294,7 +318,7 @@ class ExposureEvent(Base):
     id = Column(Integer, primary_key=True)
 
     stressor_agent_name = Column(String(255))
-    stressor_agent_id = Column(String(255))
+    chemical__id = foreign_key_to('chemical')  # == stressor_agent_id
     number_of_receptors = Column(Integer)
     receptor_description = Column(String(255))
     receptor_notes = Column(String(255))
@@ -307,8 +331,7 @@ class ExposureEvent(Base):
     assay_measurement_statistic = Column(String(255))
     assay_notes = Column(Text)
     outcome_relationship = Column(String(255))
-    disease_name = Column(String(255))
-    disease_id = Column(String(255))
+    disease__id = foreign_key_to('disease')
     phenotype_name = Column(String(255))
     phenotype_id = Column(String(255))
     reference = Column(Integer)
@@ -320,14 +343,21 @@ class GeneDisease(Base):
 
     direct_evidence = Column(String(255))
     inference_chemical_name = Column(String(255))
-    inference_score = Column(Float)
-    omim_ids = Column(String(255))
+    inference_score = Column(REAL)
     gene__id = foreign_key_to('gene')
     disease__id = foreign_key_to('disease')
 
 
+class GeneDiseaseOmim(Base):
+    __tablename__ = TABLE_PREFIX + "gene__disease__omim_id"
+    id = Column(Integer, primary_key=True)
+
+    gene__disease__id = foreign_key_to('gene__disease')
+    omim_id = Column(Integer)
+
+
 class GeneDiseasePubmed(Base):
-    __tablename__ = TABLE_PREFIX + "gene__disease__pubmed"
+    __tablename__ = TABLE_PREFIX + "gene__disease__pubmed_id"
     id = Column(Integer, primary_key=True)
 
     gene__disease__id = foreign_key_to('gene__disease')
@@ -338,11 +368,10 @@ class GeneDiseasePubmed(Base):
 
 
 class GenePathway(Base):
-    __tablename__ = TABLE_PREFIX + "gene_pathway"
+    __tablename__ = TABLE_PREFIX + "gene__pathway"
     id = Column(Integer, primary_key=True)
 
-    pathway_name = Column(String(255))
-    pathway_id = Column(Text)
+    pathway__id = foreign_key_to('pathway')
     gene__id = foreign_key_to('gene')
 
     def __repr__(self):

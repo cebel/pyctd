@@ -88,6 +88,6 @@ ENV/
 # Rope project settings
 .ropeproject
 
-# ignore
+# PyCharm settings
 .idea/
 .idea/*

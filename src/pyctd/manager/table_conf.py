@@ -16,6 +16,8 @@ def standard_db_name(file_column_name):
 
 domains_to_map = ('chemical', 'pathway', 'gene', 'disease')
 
+# ALERT: All strings in 'columns' and 'domain_id_column' will be translate by def standard_db_name into
+# (column_name_in_file, standard_column_name_in_db)
 tables = OrderedDict([
     ("pathway", {
         "file_name": 'CTD_pathways.tsv.gz',
@@ -23,7 +25,7 @@ tables = OrderedDict([
             'PathwayName',
             'PathwayID',
         ],
-        "domain_id_column": ('PathwayID', 'pathway_id')
+        "domain_id_column": 'PathwayID'
     }),
 
     ("gene", {
@@ -40,7 +42,25 @@ tables = OrderedDict([
             ('PharmGKBIDs', 'pharmgkb_id'),
             ('UniProtIDs', 'uniprot_id')
         ),
-        "domain_id_column": ('GeneID', 'gene_id')
+        "domain_id_column": 'GeneID'
+    }),
+
+    ("chemical", {
+        "file_name": 'CTD_chemicals.tsv.gz',
+        "columns": [
+            'ChemicalName',
+            'ChemicalID',
+            'CasRN',
+            'Definition',
+        ],
+        "domain_id_column": 'ChemicalID',
+        "one_to_many": (
+            ('ParentIDs', 'parent_id'),
+            ('TreeNumbers', 'tree_number'),
+            ('ParentTreeNumbers', 'parent_tree_number'),
+            ('Synonyms', 'synonym'),
+            ('DrugBankIDs', 'drugbank_id')
+        ),
     }),
 
     ("disease", {
@@ -58,14 +78,14 @@ tables = OrderedDict([
             ('Synonyms', 'synonym'),
             ('SlimMappings', "slim_mapping")
         ),
-        "domain_id_column": ('DiseaseID', 'disease_id')
+        "domain_id_column": 'DiseaseID'
     }),
 
     ("exposure_event", {
         "file_name": 'CTD_exposure_events.tsv.gz',
         "columns": [
             ('stressoragentname', 'stressor_agent_name'),
-            ('stressoragentid', 'stressor_agent_id'),
+            ('stressoragentid', 'chemical_id'),
             ('numberofreceptors', 'number_of_receptors'),
             ('receptordescription', 'receptor_description'),
             ('receptornotes', 'receptor_notes'),
@@ -78,7 +98,6 @@ tables = OrderedDict([
             ('assaymeasurementstatistic', 'assay_measurement_statistic'),
             ('assaynotes', 'assay_notes'),
             ('outcomerelationship', 'outcome_relationship'),
-            ('diseasename', 'disease_name'),
             ('diseaseid', 'disease_id'),
             ('phenotypename', 'phenotype_name'),
             ('phenotypeid', 'phenotype_id'),
@@ -95,7 +114,7 @@ tables = OrderedDict([
         ],
     }),
 
-    ("gene_pathway", {
+    ("gene__pathway", {
         "file_name": 'CTD_genes_pathways.tsv.gz',
         "columns": [
             'GeneID',
@@ -103,26 +122,13 @@ tables = OrderedDict([
         ],
     }),
 
-    ("gene_disease", {
-        "file_name": 'CTD_genes_diseases.tsv.gz',
-        "columns": [
-            'GeneID',
-            'DiseaseID',
-            'DirectEvidence',
-            'InferenceChemicalName',
-            'InferenceScore',
-            'OmimIDs',
-            'PubMedIDs',
-        ],
-    }),
-
-    ("chem_pathways_enriched", {
+    ("chem__pathway_enriched", {
         "file_name": 'CTD_chem_pathways_enriched.tsv.gz',
         "columns": [
             'ChemicalID',
             'PathwayID',
             ('PValue', 'p_value'),
-            'CorrectedPValue',
+            ('CorrectedPValue', 'corrected_p_value'),
             'TargetMatchQty',
             'TargetTotalQty',
             'BackgroundMatchQty',
@@ -130,33 +136,20 @@ tables = OrderedDict([
         ],
     }),
 
-    ("chem_go_enriched", {
+    ("chem__go_enriched", {
         "file_name": 'CTD_chem_go_enriched.tsv.gz',
         "columns": [
             'ChemicalID',
             'Ontology',
-            'GOTermName',
-            'GOTermID',
-            'HighestGOLevel',
+            ('GOTermName', 'go_term_name'),
+            ('GOTermID', 'go_term_id'),
+            ('HighestGOLevel', 'highest_go_level'),
             ('PValue', 'p_value'),
-            'CorrectedPValue',
+            ('CorrectedPValue', 'corrected_p_value'),
             'TargetMatchQty',
             'TargetTotalQty',
             'BackgroundMatchQty',
             'BackgroundTotalQty'
-        ],
-    }),
-
-    ("chemical_disease", {
-        "file_name": 'CTD_chemicals_diseases.tsv.gz',
-        "columns": [
-            'ChemicalID',
-            'DiseaseID',
-            'DirectEvidence',
-            'InferenceGeneSymbol',
-            'InferenceScore',
-            'OmimIDs',
-            'PubMedIDs'
         ],
     }),
 
@@ -173,35 +166,48 @@ tables = OrderedDict([
     ("chem_gene_ixn", {
         "file_name": 'CTD_chem_gene_ixns.tsv.gz',
         "columns": [
-            'ChemicalName',
             'ChemicalID',
-            'CasRN',
-            'GeneSymbol',
             'GeneID',
-            'GeneForms',
-            'Organism',
             'OrganismID',
             'Interaction',
-            'InteractionActions',
-            'PubMedIDs'
-        ]
+        ],
+        "one_to_many": (
+            ('PubMedIDs', 'pubmed_id'),
+            ('InteractionActions', 'interaction_action'),
+            ('GeneForms', 'gene_form'),
+        )
     }),
 
-    ("chemical", {
-        "file_name": 'CTD_chemicals.tsv.gz',
+    ("chemical__disease", {
+        "file_name": 'CTD_chemicals_diseases.tsv.gz',
         "columns": [
-            'ChemicalName',
+            'DirectEvidence',
+            'InferenceGeneSymbol',
+            'InferenceScore',
             'ChemicalID',
-            'CasRN',
-            'Definition',
-            'ParentIDs',
-            'TreeNumbers',
-            'ParentTreeNumbers',
-            'Synonyms',
-            'DrugBankIDs'
+            'DiseaseID',
         ],
-        "domain_id_column": ('ChemicalID', 'chemical_id')
-    })
+        "one_to_many": (
+            ('PubMedIDs', 'pubmed_id'),
+            ('OmimIDs', 'omim_id'),
+        ),
+    }),
+
+    ("gene__disease", {
+        "file_name": 'CTD_genes_diseases.tsv.gz',
+        "columns": [
+            'GeneID',
+            'DiseaseID',
+            'DirectEvidence',
+            'InferenceChemicalName',
+            'InferenceScore',
+        ],
+        "one_to_many": (
+            ('PubMedIDs', 'pubmed_id'),
+            ('OmimIDs', 'omim_id'),
+        ),
+    }),
+
 ])
 
 for table_name in tables:
@@ -209,3 +215,9 @@ for table_name in tables:
     for i in range(len(cols)):
         if isinstance(cols[i], str):
             cols[i] = (cols[i], standard_db_name(cols[i]))
+    if 'domain_id_column' in tables[table_name]:
+        d_id_col = tables[table_name]['domain_id_column']
+        if isinstance(d_id_col, str):
+            tables[table_name]['domain_id_column'] = (d_id_col, standard_db_name(d_id_col))
+
+

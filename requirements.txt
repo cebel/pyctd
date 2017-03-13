@@ -2,3 +2,4 @@ pandas
 configparser
 requests
 sqlalchemy
+click
