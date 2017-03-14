@@ -272,16 +272,16 @@ class DbManager(BaseDbManager):
             child_values = []
             parent_id_values = []
 
+            chunk.dropna()
             chunk.index += 1
 
             for parent_id, values in chunk.iterrows():
                 entry = values[column_index]
-                if not isinstance(entry, numpy.nan):
-                    if not isinstance(entry, str):
-                        entry = str(entry)
-                    for value in entry.split("|"):
-                        parent_id_values.append(parent_id)
-                        child_values.append(value.strip())
+                if not isinstance(entry, str):
+                    entry = str(entry)
+                for value in entry.split("|"):
+                    parent_id_values.append(parent_id)
+                    child_values.append(value.strip())
 
             parent_id_column_name = parent_table_name + '__id'
             o2m_table_name = defaults.TABLE_PREFIX + parent_table_name + '__' + column_in_one2many_table
