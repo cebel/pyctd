@@ -9,7 +9,7 @@ import io
 import gzip
 import configparser
 import urllib
-import numpy
+from sqlalchemy import distinct, func
 
 from ..constants import PYCTD_DATA_DIR, PYCTD_DIR
 
@@ -375,30 +375,41 @@ class DbManager(BaseDbManager):
         return os.path.join(PYCTD_DATA_DIR, file_name)
         
 
-class DbQuery(BaseDbManager):
-    def get_diseases__name_like(self, name):
+class Query(BaseDbManager):
+    def disease__name_like(self, name):
         q = self.session.query(models.Disease).filter(models.Disease.disease_name.like(name))
         return q.all()
 
-    def get_genes__name_like(self, name):
+    def gene__name_like(self, name):
         q = self.session.query(models.Gene).filter(models.Gene.gene_name.like(name))
         return q.all()
 
-    def get_genes__symbol_like(self, name):
+    def gene__symbol_like(self, name):
         q = self.session.query(models.Gene).filter(models.Gene.gene_symbol.like(name))
         return q.all()
 
-    def get_pathways__name_like(self, name):
+    def pathways__name_like(self, name):
         q = self.session.query(models.Pathway).filter(models.Pathway.pathway_name.like(name))
         return q.all()
 
-    def get_chemicals__name_like(self, name):
+    def chemical__name_like(self, name):
         q = self.session.query(models.Chemical).filter(models.Chemical.chemical_name.like(name))
         return q.all()
 
-    # def get_gene_pathays_name_like(self, gene_name):
-    #     q = self.session.query(models.Disease).filter(models.Disease.disease_name.like(name))
-    #     return q.all()
+    def interaction_action__distinct(self):
+        q = self.session.query(distinct(models.ChemGeneIxnInteractionAction.interaction_action))
+        return q.all()
+
+    def chemical_decreases_expression_in_human_by_gene_symbol(self, gene_symbol):
+        r = self.session.query(models.ChemGeneIxn)\
+            .join(models.Gene)\
+            .join(models.ChemGeneIxnInteractionAction)\
+            .join(models.Chemical)\
+            .join(models.ChemicalDrugbank)\
+            .filter(models.ChemGeneIxn.organism_id==9606)\
+            .filter(models.Gene.gene_symbol=='CD33')\
+            .filter(models.ChemGeneIxnInteractionAction.interaction_action=='decreases^expression')
+        return r.all()
 
 
 def update(connection=None, urls=None):
