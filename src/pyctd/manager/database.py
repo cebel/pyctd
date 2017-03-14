@@ -9,6 +9,7 @@ import io
 import gzip
 import configparser
 import urllib
+import numpy
 
 from ..constants import PYCTD_DATA_DIR, PYCTD_DIR
 
@@ -250,7 +251,7 @@ class DbManager(BaseDbManager):
 
             self.import_one_to_many(file_path, o2m_column_index, table.name, column_in_one2many_table)
 
-    def import_one_to_many_old(self, file_path, column_index, parent_table_name, column_in_one2many_table):
+    def import_one_to_many(self, file_path, column_index, parent_table_name, column_in_one2many_table):
         """
         
         :param file_path: 
@@ -259,97 +260,36 @@ class DbManager(BaseDbManager):
         :param column_in_one2many_table: 
         :return: 
         """
-
         chunks = pd.read_table(
             file_path,
             usecols=[column_index],
             header=None,
             comment='#',
             index_col=False,
-            chunksize=100000)
+            chunksize=1000000)
 
         for chunk in chunks:
             child_values = []
             parent_id_values = []
 
             chunk.index += 1
-            chunk.dropna()
 
             for parent_id, values in chunk.iterrows():
-                if isinstance(values[column_index], str):
-                    for value in values[column_index].split(defaults.value_delimiter):
+                entry = values[column_index]
+                if not isinstance(entry, numpy.nan):
+                    if not isinstance(entry, str):
+                        entry = str(entry)
+                    for value in entry.split("|"):
                         parent_id_values.append(parent_id)
                         child_values.append(value.strip())
 
             parent_id_column_name = parent_table_name + '__id'
             o2m_table_name = defaults.TABLE_PREFIX + parent_table_name + '__' + column_in_one2many_table
 
-            df = pd.DataFrame({
+            pd.DataFrame({
                 parent_id_column_name: parent_id_values,
                 column_in_one2many_table: child_values
-            })
-            df.to_sql(name=o2m_table_name, if_exists='append', con=self.engine, index=False)
-
-    def import_one_to_many(self, file_path, column_index, parent_table_name, column_in_one2many_table):
-        """
-
-        :param file_path: 
-        :param column_index: 
-        :param parent_table_name: 
-        :param column_in_one2many_table: 
-        :return: 
-        """
-        parent_id_column_name = parent_table_name + '__id'
-        o2m_table_name = defaults.TABLE_PREFIX + parent_table_name + '__' + column_in_one2many_table
-
-        log.info('create one-to-many table {}'.format(o2m_table_name))
-
-        chunks = pd.read_table(
-            file_path,
-            usecols=[column_index],
-            names=[column_in_one2many_table],
-            header=None,
-            comment='#',
-            index_col=False,
-            chunksize=1000000)
-
-        for df in chunks:
-            df.dropna(inplace=True)
-            df[parent_id_column_name] = df.index + 1
-
-            df_without_delimiter = df[~df[column_in_one2many_table].str.contains(defaults.value_delimiter)]
-            df_without_delimiter.to_sql(
-                name=o2m_table_name,
-                if_exists='append',
-                con=self.engine,
-                index=False)
-
-            df_with_delimiter = df[df[column_in_one2many_table].str.contains(defaults.value_delimiter)]
-            df_with_delimiter_normalized = DbManager.get_first_normal_form_dataframe(
-                dataframe=df_with_delimiter,
-                column_name=column_in_one2many_table,
-                delimiter=defaults.value_delimiter
-            )
-            df_with_delimiter_normalized.to_sql(
-                name=o2m_table_name,
-                if_exists='append',
-                con=self.engine,
-                index=False)
-
-    @staticmethod
-    def get_first_normal_form_dataframe(dataframe, column_name, delimiter):
-        """transforms list values in single rows
-        
-        :param delimiter: 
-        :param dataframe: pandas dataframe
-        :param column_name: col
-        :return: 
-        """
-        s = dataframe[column_name].str.split(delimiter).apply(pd.Series, 1).stack()
-        s.index = s.index.droplevel(-1)
-        s.name = column_name
-        del dataframe[column_name]
-        return dataframe.join(s)
+            }).to_sql(name=o2m_table_name, if_exists='append', con=self.engine, index=False)
 
     def import_table_in_db(self, file_path, use_columns_with_index, column_names_in_db, table_name):
         """Imports data from CTD file into database
@@ -433,7 +373,33 @@ class DbManager(BaseDbManager):
         file_name = urlparse(url).path.split('/')[-1]
         return os.path.join(PYCTD_DATA_DIR, file_name)
         
-                        
+
+class DbQuery(BaseDbManager):
+    def get_diseases__name_like(self, name):
+        q = self.session.query(models.Disease).filter(models.Disease.disease_name.like(name))
+        return q.all()
+
+    def get_genes__name_like(self, name):
+        q = self.session.query(models.Gene).filter(models.Gene.gene_name.like(name))
+        return q.all()
+
+    def get_genes__symbol_like(self, name):
+        q = self.session.query(models.Gene).filter(models.Gene.gene_symbol.like(name))
+        return q.all()
+
+    def get_pathways__name_like(self, name):
+        q = self.session.query(models.Pathway).filter(models.Pathway.pathway_name.like(name))
+        return q.all()
+
+    def get_chemicals__name_like(self, name):
+        q = self.session.query(models.Chemical).filter(models.Chemical.chemical_name.like(name))
+        return q.all()
+
+    # def get_gene_pathays_name_like(self, gene_name):
+    #     q = self.session.query(models.Disease).filter(models.Disease.disease_name.like(name))
+    #     return q.all()
+
+
 def update(connection=None, urls=None):
     """Updates CTD database
 

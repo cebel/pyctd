@@ -6,6 +6,7 @@ from sqlalchemy import Column, ForeignKey
 from sqlalchemy import Integer, String, Text, REAL
 from sqlalchemy.ext.declarative import declarative_base
 from .defaults import TABLE_PREFIX
+from sqlalchemy.orm import relationship
 
 Base = declarative_base()
 
@@ -55,6 +56,12 @@ class Chemical(Base):
     cas_rn = Column(String(255))
     definition = Column(Text)
 
+    parent_ids = relationship("ChemicalParentid", back_populates="chemical")
+    tree_numbers = relationship("ChemicalTreenumber", back_populates="chemical")
+    parent_tree_numbers = relationship("ChemicalParenttreenumber", back_populates="chemical")
+    drugbank_ids = relationship("ChemicalDrugbank", back_populates="chemical")
+    synonyms = relationship("ChemicalSynonym", back_populates="chemical")
+
     def __repr__(self):
         return self.chemical_name
 
@@ -66,6 +73,11 @@ class ChemicalParentid(Base):
     chemical__id = foreign_key_to('chemical')
     parent_id = Column(String(255))
 
+    chemical = relationship(Chemical, back_populates="parent_ids")
+
+    def __repr__(self):
+        return self.parent_id
+
 
 class ChemicalTreenumber(Base):
     __tablename__ = TABLE_PREFIX + "chemical__tree_number"
@@ -73,6 +85,11 @@ class ChemicalTreenumber(Base):
 
     chemical__id = foreign_key_to('chemical')
     tree_number = Column(String(255))
+
+    chemical = relationship(Chemical, back_populates="tree_numbers")
+
+    def __repr__(self):
+        return self.tree_number
 
 
 class ChemicalParenttreenumber(Base):
@@ -82,6 +99,11 @@ class ChemicalParenttreenumber(Base):
     chemical__id = foreign_key_to('chemical')
     parent_tree_number = Column(String(255))
 
+    chemical = relationship(Chemical, back_populates="parent_tree_numbers")
+
+    def __repr__(self):
+        return self.parent_tree_number
+
 
 class ChemicalDrugbank(Base):
     __tablename__ = TABLE_PREFIX + "chemical__drugbank_id"
@@ -90,6 +112,11 @@ class ChemicalDrugbank(Base):
     chemical__id = foreign_key_to('chemical')
     drugbank_id = Column(String(255))
 
+    chemical = relationship(Chemical, back_populates="drugbank_ids")
+
+    def __repr__(self):
+        return self.drugbank_id
+
 
 class ChemicalSynonym(Base):
     __tablename__ = TABLE_PREFIX + "chemical__synonym"
@@ -97,6 +124,11 @@ class ChemicalSynonym(Base):
 
     chemical__id = foreign_key_to('chemical')
     synonym = Column(Text)
+
+    chemical = relationship(Chemical, back_populates="synonyms")
+
+    def __repr__(self):
+        return self.synonym
 
 
 class Disease(Base):
@@ -110,6 +142,10 @@ class Disease(Base):
     tree_numbers = Column(Text)
     parent_tree_numbers = Column(Text)
 
+    synonyms = relationship("DiseaseSynonym", back_populates="disease")
+    alt_disease_ids = relationship("DiseaseAltdiseaseid", back_populates="disease")
+    slim_mappings = relationship("DiseaseSlimmapping", back_populates="disease")
+
     def __repr__(self):
         return self.disease_name
 
@@ -121,6 +157,11 @@ class DiseaseSynonym(Base):
     disease__id = foreign_key_to('disease')
     synonym = Column(String(255))
 
+    disease = relationship(Disease, back_populates="synonyms")
+
+    def __repr__(self):
+        return self.synonym
+
 
 class DiseaseAltdiseaseid(Base):
     __tablename__ = TABLE_PREFIX + "disease__alt_disease_id"
@@ -128,6 +169,11 @@ class DiseaseAltdiseaseid(Base):
 
     disease__id = foreign_key_to('disease')
     alt_disease_id = Column(String(255))
+
+    disease = relationship(Disease, back_populates="alt_disease_ids")
+
+    def __repr__(self):
+        return self.alt_disease_id
 
 
 class DiseaseSlimmapping(Base):
@@ -137,6 +183,11 @@ class DiseaseSlimmapping(Base):
     disease__id = foreign_key_to('disease')
     slim_mapping = Column(String(255))
 
+    disease = relationship(Disease, back_populates="slim_mappings")
+
+    def __repr__(self):
+        return self.slim_mapping
+
 
 class Gene(Base):
     __tablename__ = TABLE_PREFIX + "gene"
@@ -145,6 +196,12 @@ class Gene(Base):
     gene_symbol = Column(String(255))
     gene_name = Column(Text)
     gene_id = Column(Integer)
+
+    alt_gene_ids = relationship("GeneAltGeneId", back_populates="gene")
+    pharmgkb_ids = relationship("GenePharmgkb", back_populates="gene")
+    uniprot_ids = relationship("GeneUniprot", back_populates="gene")
+    biogrid_ids = relationship("GeneBiogrid", back_populates="gene")
+    synonyms = relationship("GeneSynonym", back_populates="gene")
 
     def __repr__(self):
         return self.gene_name
@@ -157,6 +214,11 @@ class GeneAltGeneId(Base):
     gene__id = foreign_key_to('gene')
     alt_gene_id = Column(Integer)
 
+    gene = relationship(Gene, back_populates="alt_gene_ids")
+
+    def __repr__(self):
+        return self.alt_gene_id
+
 
 class GenePharmgkb(Base):
     __tablename__ = TABLE_PREFIX + "gene__pharmgkb_id"
@@ -164,6 +226,11 @@ class GenePharmgkb(Base):
 
     gene__id = foreign_key_to('gene')
     pharmgkb_id = Column(String(255))
+
+    gene = relationship(Gene, back_populates="pharmgkb_ids")
+
+    def __repr__(self):
+        return self.pharmgkb_id
 
 
 class GeneUniprot(Base):
@@ -173,6 +240,11 @@ class GeneUniprot(Base):
     gene__id = foreign_key_to('gene')
     uniprot_id = Column(String(255))
 
+    gene = relationship(Gene, back_populates="uniprot_ids")
+
+    def __repr__(self):
+        return self.uniprot_id
+
 
 class GeneBiogrid(Base):
     __tablename__ = TABLE_PREFIX + "gene__biogrid_id"
@@ -181,6 +253,11 @@ class GeneBiogrid(Base):
     gene__id = foreign_key_to('gene')
     biogrid_id = Column(Integer)
 
+    gene = relationship(Gene, back_populates="biogrid_ids")
+
+    def __repr__(self):
+        return self.biogrid_id
+
 
 class GeneSynonym(Base):
     __tablename__ = TABLE_PREFIX + "gene__synonym"
@@ -188,6 +265,11 @@ class GeneSynonym(Base):
 
     gene__id = foreign_key_to('gene')
     synonym = Column(Text)
+
+    gene = relationship(Gene, back_populates="synonyms")
+
+    def __repr__(self):
+        return self.synonym
 
 
 class ChemicalDisease(Base):
@@ -199,6 +281,15 @@ class ChemicalDisease(Base):
     inference_score = Column(REAL)
     chemical__id = foreign_key_to('chemical')
     disease__id = foreign_key_to('disease')
+
+    chemical = relationship('Chemical')
+    disease = relationship('Disease')
+
+    omim_ids = relationship('ChemicalDiseaseOmim')
+    pubmed_ids = relationship('ChemicalDiseasePubmedid')
+
+    def __repr__(self):
+        return '{}:{}'.format(self.chemical, self.disease)
 
 
 class ChemicalDiseaseOmim(Base):
@@ -230,6 +321,9 @@ class ChemPathwayEnriched(Base):
     chemical__id = foreign_key_to('chemical')
     pathway__id = foreign_key_to('pathway')
 
+    chemical = relationship('Chemical')
+    pathway = relationship('Pathway')
+
 
 class ChemGeneIxn(Base):
     """Chemical–gene interactions"""
@@ -242,8 +336,20 @@ class ChemGeneIxn(Base):
     chemical__id = foreign_key_to('chemical')
     gene__id = foreign_key_to('gene')
 
+    chemical = relationship('Chemical')
+    gene = relationship('Gene')
+
+    gene_forms = relationship('ChemGeneIxnGeneForm')
+    interaction_actions = relationship('ChemGeneIxnInteractionAction')
+    pubmed_ids = relationship('ChemGeneIxnPubmed')
+
+
     def __repr__(self):
-        return self.interaction
+        return '{} -> {}; interaction: {}'.format(
+            self.chemical,
+            self.gene,
+            self.interaction
+        )
 
 
 class ChemGeneIxnGeneForm(Base):
@@ -267,6 +373,9 @@ class ChemGeneIxnInteractionAction(Base):
 
     chem_gene_ixn__id = foreign_key_to('chem_gene_ixn')
     interaction_action = Column(String(255))
+
+    def __repr__(self):
+        return self.interaction_action
 
 
 class ChemGeneIxnPubmed(Base):
@@ -300,6 +409,8 @@ class ChemGoEnriched(Base):
     background_total_qty = Column(Integer)
     chemical__id = foreign_key_to('chemical')
 
+    chemical = relationship('Chemical')
+
     def __repr__(self):
         return self.go_term_name
 
@@ -311,6 +422,16 @@ class DiseasePathway(Base):
     pathway__id = foreign_key_to('pathway')
     disease__id = foreign_key_to('disease')
     inference_gene_symbol = Column(String(255))
+
+    pathway = relationship('Pathway')
+    disease = relationship('Disease')
+
+    def __repr__(self):
+        return 'pathway:{}; disease:{}; interference gene:{}'.format(
+            self.pathway,
+            self.disease,
+            self.inference_gene_symbol
+        )
 
 
 class ExposureEvent(Base):
@@ -336,6 +457,9 @@ class ExposureEvent(Base):
     phenotype_id = Column(String(255))
     reference = Column(Integer)
 
+    chemical = relationship('Chemical')
+    disease = relationship('Disease')
+
 
 class GeneDisease(Base):
     __tablename__ = TABLE_PREFIX + "gene__disease"
@@ -346,6 +470,20 @@ class GeneDisease(Base):
     inference_score = Column(REAL)
     gene__id = foreign_key_to('gene')
     disease__id = foreign_key_to('disease')
+
+    gene = relationship('Gene')
+    disease = relationship('Disease')
+
+    omim_ids = relationship('GeneDiseaseOmim')
+    pubmed_ids = relationship('GeneDiseasePubmed')
+
+    def __repr__(self):
+        return 'gene:{}; disease:{}; chemical:{}; evidence:{}'.format(
+            self.gene,
+            self.disease,
+            self.inference_chemical_name,
+            self.direct_evidence
+        )
 
 
 class GeneDiseaseOmim(Base):
@@ -374,5 +512,8 @@ class GenePathway(Base):
     pathway__id = foreign_key_to('pathway')
     gene__id = foreign_key_to('gene')
 
+    pathway = relationship('Pathway')
+    gene = relationship('Gene')
+
     def __repr__(self):
-        return self.pathway_name
+        return 'gene:{}; pathway:{}'.format(self.pathway, self.gene)
