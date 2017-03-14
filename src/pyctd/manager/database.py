@@ -272,7 +272,7 @@ class DbManager(BaseDbManager):
             child_values = []
             parent_id_values = []
 
-            chunk.dropna()
+            chunk.dropna(inplace=True)
             chunk.index += 1
 
             for parent_id, values in chunk.iterrows():
