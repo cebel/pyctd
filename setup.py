@@ -4,7 +4,7 @@ from setuptools import setup, find_packages
 PACKAGES = find_packages(where='src')
 
 INSTALL_REQUIRES = [
-    'sqlalchemy', 'pandas'
+    'sqlalchemy', 'pandas', 'pymysql'
 ]
 
 ENTRY_POINTS = {

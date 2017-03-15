@@ -143,8 +143,8 @@ class DbManager(BaseDbManager):
 
         log.info('Update CTD database from {}'.format(urls))
 
-        self.download_urls(urls)
         self.drop_tables()
+        self.download_urls(urls)
         self.create_tables()
         self.import_tables()
 
@@ -400,15 +400,73 @@ class Query(BaseDbManager):
         q = self.session.query(distinct(models.ChemGeneIxnInteractionAction.interaction_action))
         return q.all()
 
-    def chemical_decreases_expression_in_human_by_gene_symbol(self, gene_symbol):
+    def chem_gene_interaction_action(self, gene_symbol, organism_id, interaction, action):
         r = self.session.query(models.ChemGeneIxn)\
             .join(models.Gene)\
             .join(models.ChemGeneIxnInteractionAction)\
             .join(models.Chemical)\
             .join(models.ChemicalDrugbank)\
-            .filter(models.ChemGeneIxn.organism_id==9606)\
-            .filter(models.Gene.gene_symbol=='CD33')\
-            .filter(models.ChemGeneIxnInteractionAction.interaction_action=='decreases^expression')
+            .filter(models.ChemGeneIxn.organism_id==organism_id)\
+            .filter(models.Gene.gene_symbol==gene_symbol)\
+            .filter(models.ChemGeneIxnInteractionAction.interaction_action==interaction+'^'+action)
+        return r.all()
+
+    def chemical_increases_expression_in_human_by_gene_symbol(self, gene_symbol):
+        attr_dict = {
+            'organism_id': 9606,
+            'interaction': "increases",
+            'action': "expression",
+            'gene_symbol': gene_symbol
+        }
+        return self.chem_gene_interaction_action(**attr_dict)
+
+    def chemical_decreases_expression_in_human_by_gene_symbol(self, gene_symbol):
+        attr_dict = {
+            'organism_id': 9606,
+            'interaction': "decreases",
+            'action': "expression",
+            'gene_symbol': gene_symbol
+        }
+        return self.chem_gene_interaction_action(**attr_dict)
+
+    def pathway__by__gene_symbol(self, gene_symbol):
+        r = self.session.query(models.GenePathway)\
+            .join(models.Gene)\
+            .filter(models.Gene.gene_symbol==gene_symbol)
+
+        return [x.pathway for x in r.all()]
+
+    def go_enriched__by__chemical_name(self, chemical_name):
+        r = self.session.query(models.ChemGoEnriched)\
+            .join(models.Chemical)\
+            .filter(models.Chemical.chemical_name==chemical_name)\
+            .order_by(models.ChemGoEnriched.highest_go_level.desc(), models.ChemGoEnriched.corrected_p_value)
+        return r.all()
+
+    def pathway_enriched__by__chemical_name(self, chemical_name):
+        r = self.session.query(models.ChemPathwayEnriched)\
+            .join(models.Chemical)\
+            .filter(models.Chemical.chemical_name==chemical_name)\
+            .order_by(models.ChemPathwayEnriched.corrected_p_value)
+        return r.all()
+
+    def therapeutic_chemical__by__disease(self, disease_name):
+        r = self.session.query(models.ChemicalDisease)\
+            .join(models.Disease)\
+            .filter(models.Disease.disease_name==disease_name, models.ChemicalDisease.direct_evidence=='therapeutic')
+        return r.all()
+
+    def marker_chemical__by__disease(self, disease_name):
+        r = self.session.query(models.ChemicalDisease)\
+            .join(models.Disease)\
+            .filter(models.Disease.disease_name==disease_name, models.ChemicalDisease.direct_evidence=='marker/mechanism')
+        return r.all()
+
+    def chemical__by__disease(self, disease_name):
+        r = self.session.query(models.ChemicalDisease)\
+            .join(models.Disease)\
+            .filter(models.Disease.disease_name==disease_name)\
+            .order_by(models.ChemicalDisease.inference_score.desc())
         return r.all()
 
 

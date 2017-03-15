@@ -51,7 +51,7 @@ class Chemical(Base):
     __tablename__ = TABLE_PREFIX + "chemical"
     id = Column(Integer, primary_key=True)
 
-    chemical_name = Column(String(255))
+    chemical_name = Column(String(255), index=True)
     chemical_id = Column(String(255))
     cas_rn = Column(String(255))
     definition = Column(Text)
@@ -193,7 +193,7 @@ class Gene(Base):
     __tablename__ = TABLE_PREFIX + "gene"
     id = Column(Integer, primary_key=True)
 
-    gene_symbol = Column(String(255))
+    gene_symbol = Column(String(255), index=True)
     gene_name = Column(Text)
     gene_id = Column(Integer)
 
@@ -289,7 +289,12 @@ class ChemicalDisease(Base):
     pubmed_ids = relationship('ChemicalDiseasePubmedid')
 
     def __repr__(self):
-        return '{}:{}'.format(self.chemical, self.disease)
+        return '{} : {} [gene: {}, score: {}]'.format(
+            self.chemical,
+            self.disease,
+            self.inference_gene_symbol,
+            self.inference_score
+        )
 
 
 class ChemicalDiseaseOmim(Base):
@@ -324,6 +329,13 @@ class ChemPathwayEnriched(Base):
     chemical = relationship('Chemical')
     pathway = relationship('Pathway')
 
+    def __repr__(self):
+        return 'chemical: {}; pathway: {}; corrected p-value: {}'.format(
+            self.chemical,
+            self.pathway,
+            self.corrected_p_value
+        )
+
 
 class ChemGeneIxn(Base):
     """Chemical–gene interactions"""
@@ -342,7 +354,6 @@ class ChemGeneIxn(Base):
     gene_forms = relationship('ChemGeneIxnGeneForm')
     interaction_actions = relationship('ChemGeneIxnInteractionAction')
     pubmed_ids = relationship('ChemGeneIxnPubmed')
-
 
     def __repr__(self):
         return '{} -> {}; interaction: {}'.format(
@@ -372,7 +383,7 @@ class ChemGeneIxnInteractionAction(Base):
     id = Column(Integer, primary_key=True)
 
     chem_gene_ixn__id = foreign_key_to('chem_gene_ixn')
-    interaction_action = Column(String(255))
+    interaction_action = Column(String(255), index=True)
 
     def __repr__(self):
         return self.interaction_action
@@ -388,7 +399,7 @@ class ChemGeneIxnPubmed(Base):
     pubmed_id = Column(Integer)
 
     def __repr__(self):
-        return self.pubmed_id
+        return str(self.pubmed_id)
 
 
 class ChemGoEnriched(Base):
@@ -412,7 +423,11 @@ class ChemGoEnriched(Base):
     chemical = relationship('Chemical')
 
     def __repr__(self):
-        return self.go_term_name
+        return '{} [corrected p-value:{}, highest GO level:{}]'.format(
+            self.go_term_name,
+            self.corrected_p_value,
+            self.highest_go_level
+        )
 
 
 class DiseasePathway(Base):
