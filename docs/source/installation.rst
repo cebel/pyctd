@@ -1,0 +1,4 @@
+Installation
+============
+
+.. automodule:: pyctd

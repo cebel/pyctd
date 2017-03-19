@@ -45,10 +45,9 @@ class BaseDbManager:
     """Creates a connection to database and a persistient session using SQLAlchemy"""
 
     def __init__(self, connection=None, echo=False):
-        """Blbla
-        
-        :param connection: 
-        :param echo: 
+        """
+        :param str connection: SQLAlchemy connection string
+        :param bool echo: True or False for SQL output of SQLAlchemy engine
         """
         log.setLevel(logging.INFO)
         
@@ -71,7 +70,7 @@ class BaseDbManager:
     def get_connection_string(connection=None):
         """return sqlalchemy connection string if it is set
         
-        :param connection: 
+        :param connection: get the SQLAlchemy connection string #TODO
         :return: 
         """
         if not connection:
@@ -94,15 +93,16 @@ class BaseDbManager:
     def create_tables(self, checkfirst=True):
         """
         
-        :param checkfirst: 
+        :param checkfirst: True or False check if tables already exists
+        :type checkfirst: bool
         :return: 
         """
         log.info('create tables in {}'.format(self.engine.url))
         models.Base.metadata.create_all(self.engine, checkfirst=checkfirst)
 
     def drop_tables(self):
-        """
-        
+        """drops all tables in the database
+
         :return: 
         """
         log.info('drop tables in {}'.format(self.engine.url))
@@ -128,6 +128,7 @@ class DbManager(BaseDbManager):
 
     def db_import(self, urls=None):
         """Updates the CTD database
+        
         1. downloads all files from CTD
         2. drops all tables in database
         3. creates all tables in database
@@ -150,9 +151,13 @@ class DbManager(BaseDbManager):
 
     @property
     def mapper(self):
-        """
+        """returns a dictionary with keys of pyctd.manager.table_con.domains_to_map and pandas.DataFrame as values. 
+        DataFrames column names:
+            - domain_id (represents the domain identifier of e.g. chemical)
+            - domain__id (represents the primary key in domain table)
         
-        :return: 
+        :return: dict of pandas DataFrames (keys:domain_name, values:DataFrame)
+        :rtype dict of pandas.DataFrame
         """
         if not self.__mapper:
             for domain in table_conf.domains_to_map:
@@ -180,14 +185,15 @@ class DbManager(BaseDbManager):
                 self.__mapper[domain] = df
         return self.__mapper
 
-    def import_tables(self, names=()):
-        """
+    def import_tables(self, only_tables=(), exclude_tables=()):
+        """Imports all data in database tables
         
-        :param names: 
+        :param only_tables: iterable of tables to be imported
+        :type only_tables: iterable of str
         :return: 
         """
         for table in self.tables:
-            if names and table.name not in names:
+            if (only_tables and table.name not in only_tables) or table.name in exclude_tables:
                 continue
             self.import_table(table)
 
@@ -368,39 +374,166 @@ class DbManager(BaseDbManager):
     def get_path_to_file_from_url(self, url):
         """standard file path
         
-        :param url: CTD download URL 
-        :type url: str
+        :param str url: CTD download URL 
         """
         file_name = urlparse(url).path.split('/')[-1]
         return os.path.join(PYCTD_DATA_DIR, file_name)
         
 
 class Query(BaseDbManager):
-    def disease__name_like(self, name):
-        q = self.session.query(models.Disease).filter(models.Disease.disease_name.like(name))
+    """Query interface to database."""
+    def get_disease(self, disease_name=None, disease_id=None, definition=None, parent_ids=None, tree_numbers=None,\
+                    parent_tree_numbers=None, slim_mapping=None, synonym=None, alt_disease_id=None):
+        """
+        
+        :param str disease_name: disease name
+        :param disease_id: disease identifier
+        :param definition: definition of disease
+        :param parent_ids: parent identifiers, delimiter |
+        :param tree_numbers: tree numbers, delimiter |
+        :param parent_tree_numbers: parent tree numbers, delimiter
+        :param slim_mapping: 
+        :param synonym: disease synonyms
+        :param alt_disease_id: alternative disease identifiers
+        :return pyctd.manager.models.Disease: PyCTD disease model object
+        :rtype pyctd.manager.models.Disease
+        """
+        q = self.session.query(models.Disease)
+        if disease_name:
+            q = q.filter(models.Disease.disease_name.like(disease_name))
+        if disease_id:
+            q = q.filter(models.Disease.disease_id==disease_id)
+        if definition:
+            q = q.filter(models.Disease.definition.like(definition))
+        if parent_ids:
+            q = q.filter(models.Disease.parent_ids.like(parent_ids))
+        if tree_numbers:
+            q = q.filter(models.Disease.tree_numbers.like(tree_numbers))
+        if parent_tree_numbers:
+            q = q.filter(models.Disease.parent_tree_numbers.like(parent_tree_numbers))
+        if slim_mapping:
+            q = q.join(models.DiseaseSlimmapping).filter(models.DiseaseSlimmapping.slim_mapping.like(slim_mapping))
+        if synonym:
+            q = q.join(models.DiseaseSynonym).filter(models.DiseaseSynonym.synonym.like(synonym))
+        if alt_disease_id:
+            q = q.join(models.DiseaseAltdiseaseid).filter(models.DiseaseAltdiseaseid.alt_disease_id==alt_disease_id)
         return q.all()
 
-    def gene__name_like(self, name):
-        q = self.session.query(models.Gene).filter(models.Gene.gene_name.like(name))
+    def get_gene(self, gene_name=None, gene_symbol=None, gene_id=None, synonym=None, uniprot_id=None,\
+                 pharmgkb_id=None, biogrid_id=None):
+        """
+        
+        :param gene_name: 
+        :param gene_symbol: 
+        :param gene_id: 
+        :param synonym: 
+        :param uniprot_id: 
+        :param pharmgkb_id: 
+        :param biogrid_id: 
+        :return: 
+        """
+        q = self.session.query(models.Gene)
+        if gene_symbol:
+            q = q.filter(models.Gene.gene_symbol.like(gene_symbol))
+        if gene_name:
+            q = q.filter(models.Gene.gene_name.like(gene_name))
+        if gene_id:
+            q = q.filter(models.Gene.gene_id.like(gene_id))
+        if synonym:
+            q = q.join(models.GeneSynonym).filter(models.GeneSynonym.synonym==synonym)
+        if uniprot_id:
+            q = q.join(models.GeneUniprot).filter(models.GeneUniprot.uniprot_id==uniprot_id)
+        if pharmgkb_id:
+            q = q.join(models.GenePharmgkb).filter(models.GenePharmgkb.pharmgkb_id==pharmgkb_id)
+        if biogrid_id:
+            q = q.join(models.GeneBiogrid).filter(models.GeneBiogrid.biogrid_id==biogrid_id)
         return q.all()
 
-    def gene__symbol_like(self, name):
-        q = self.session.query(models.Gene).filter(models.Gene.gene_symbol.like(name))
+    def get_pathway(self, pathway_name=None, pathway_id=None):
+        """
+        
+        :param pathway_name: 
+        :param pathway_id: 
+        :return: 
+        """
+        q = self.session.query(models.Pathway)
+        if pathway_name:
+            q = q.filter(models.Pathway.pathway_name.like(pathway_name))
+        if pathway_id:
+            q = q.filter(models.Pathway.pathway_name.like(pathway_id))
         return q.all()
 
-    def pathways__name_like(self, name):
-        q = self.session.query(models.Pathway).filter(models.Pathway.pathway_name.like(name))
+    def get_chemical(self, chemical_name=None, chemical_id=None, cas_rn=None, drugbank_id=None, parent_id=None, \
+                     parent_tree_number=None, tree_number=None, synonym=None):
+        """
+        
+        :param chemical_name: 
+        :param chemical_id: 
+        :param cas_rn: 
+        :param drugbank_id: 
+        :param parent_id: 
+        :param parent_tree_number: 
+        :param tree_number: 
+        :param synonym: 
+        :return: 
+        """
+        q = self.session.query(models.Chemical)
+        if chemical_name:
+            q = q.filter(models.Chemical.chemical_name.like(chemical_name))
+        if chemical_id:
+            q = q.filter(models.Chemical.chemical_id==chemical_id)
+        if cas_rn:
+            q = q.filter(models.Chemical.cas_rn == cas_rn)
+        if drugbank_id:
+            q = q.join(models.ChemicalDrugbank).filter(models.ChemicalDrugbank.drugbank_id==drugbank_id)
+        if parent_id:
+            q = q.join(models.ChemicalParentid).filter(models.models.ChemicalParentid.parent_id==parent_id)
+        if tree_number:
+            q = q.join(models.ChemicalTreenumber)\
+                .filter(models.ChemicalTreenumber.tree_number==tree_number)
+        if parent_tree_number:
+            q = q.join(models.ChemicalParenttreenumber)\
+                .filter(models.ChemicalParenttreenumber.parent_tree_number==parent_tree_number)
+        if synonym:
+            q = q.join(models.ChemicalSynonym).filter(models.ChemicalSynonym.synonym.like(synonym))
         return q.all()
 
-    def chemical__name_like(self, name):
-        q = self.session.query(models.Chemical).filter(models.Chemical.chemical_name.like(name))
-        return q.all()
-
-    def interaction_action__distinct(self):
+    @property
+    def interaction_actions(self):
+        """
+        
+        :return: 
+        """
         q = self.session.query(distinct(models.ChemGeneIxnInteractionAction.interaction_action))
         return q.all()
 
-    def chem_gene_interaction_action(self, gene_symbol, organism_id, interaction, action):
+    @property
+    def actions(self):
+        """
+        
+        :return: 
+        """
+        q = self.session.query(models.Action)
+        return q.all()
+
+    @property
+    def pathways(self):
+        """
+        
+        :return: 
+        """
+        q = self.session.query(models.Pathway)
+        return q.all()
+
+    def get_chem_gene_interaction_action(self, gene_symbol, organism_id, interaction='%', action='%'):
+        """
+        
+        :param gene_symbol: 
+        :param organism_id: 
+        :param interaction: 
+        :param action: 
+        :return: 
+        """
         r = self.session.query(models.ChemGeneIxn)\
             .join(models.Gene)\
             .join(models.ChemGeneIxnInteractionAction)\
@@ -408,10 +541,10 @@ class Query(BaseDbManager):
             .join(models.ChemicalDrugbank)\
             .filter(models.ChemGeneIxn.organism_id==organism_id)\
             .filter(models.Gene.gene_symbol==gene_symbol)\
-            .filter(models.ChemGeneIxnInteractionAction.interaction_action==interaction+'^'+action)
+            .filter(models.ChemGeneIxnInteractionAction.interaction_action.like(interaction+'^'+action))
         return r.all()
 
-    def chemical_increases_expression_in_human_by_gene_symbol(self, gene_symbol):
+    def get_chemical__increases_expression_in_human_by__gene_symbol(self, gene_symbol):
         attr_dict = {
             'organism_id': 9606,
             'interaction': "increases",
@@ -420,7 +553,7 @@ class Query(BaseDbManager):
         }
         return self.chem_gene_interaction_action(**attr_dict)
 
-    def chemical_decreases_expression_in_human_by_gene_symbol(self, gene_symbol):
+    def get_chemical__decreases_expression_in_human_by__gene_symbol(self, gene_symbol):
         attr_dict = {
             'organism_id': 9606,
             'interaction': "decreases",
@@ -429,46 +562,48 @@ class Query(BaseDbManager):
         }
         return self.chem_gene_interaction_action(**attr_dict)
 
-    def pathway__by__gene_symbol(self, gene_symbol):
+    def get_pathway__by__gene_symbol(self, gene_symbol):
         r = self.session.query(models.GenePathway)\
             .join(models.Gene)\
             .filter(models.Gene.gene_symbol==gene_symbol)
 
         return [x.pathway for x in r.all()]
 
-    def go_enriched__by__chemical_name(self, chemical_name):
+    def get_go_enriched__by__chemical_name(self, chemical_name):
         r = self.session.query(models.ChemGoEnriched)\
             .join(models.Chemical)\
             .filter(models.Chemical.chemical_name==chemical_name)\
             .order_by(models.ChemGoEnriched.highest_go_level.desc(), models.ChemGoEnriched.corrected_p_value)
         return r.all()
 
-    def pathway_enriched__by__chemical_name(self, chemical_name):
+    def get_pathway_enriched__by__chemical_name(self, chemical_name):
         r = self.session.query(models.ChemPathwayEnriched)\
             .join(models.Chemical)\
             .filter(models.Chemical.chemical_name==chemical_name)\
             .order_by(models.ChemPathwayEnriched.corrected_p_value)
         return r.all()
 
-    def therapeutic_chemical__by__disease(self, disease_name):
+    def get_therapeutic_chemical__by__disease_name(self, disease_name):
         r = self.session.query(models.ChemicalDisease)\
             .join(models.Disease)\
             .filter(models.Disease.disease_name==disease_name, models.ChemicalDisease.direct_evidence=='therapeutic')
         return r.all()
 
-    def marker_chemical__by__disease(self, disease_name):
+    def get_marker_chemical__by__disease_name(self, disease_name):
         r = self.session.query(models.ChemicalDisease)\
             .join(models.Disease)\
             .filter(models.Disease.disease_name==disease_name, models.ChemicalDisease.direct_evidence=='marker/mechanism')
         return r.all()
 
-    def chemical__by__disease(self, disease_name):
+    def get_chemical__by__disease(self, disease_name):
         r = self.session.query(models.ChemicalDisease)\
             .join(models.Disease)\
             .filter(models.Disease.disease_name==disease_name)\
             .order_by(models.ChemicalDisease.inference_score.desc())
         return r.all()
 
+    def get_exposure_event(self):
+        pass
 
 def update(connection=None, urls=None):
     """Updates CTD database
