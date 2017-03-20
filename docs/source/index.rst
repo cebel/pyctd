@@ -1,8 +1,8 @@
 PyCTD Documentation
 ===================
 
-.. image:: https://upload.wikimedia.org/wikipedia/en/0/02/Logo_Innovative_Medicines_Initiative.jpg
-   :width: 150 px
+.. image:: http://adaptsmart.eu/wp-content/uploads/2015/09/imi-logo.png
+   :width: 200 px
 
 .. image:: http://www.aetionomy.eu/content/dam/scai/AETIONOMY/Logo-Aetionomy.png
    :width: 200 px
