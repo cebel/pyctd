@@ -551,7 +551,7 @@ class Query(BaseDbManager):
             'action': "expression",
             'gene_symbol': gene_symbol
         }
-        return self.chem_gene_interaction_action(**attr_dict)
+        return self.get_chem_gene_interaction_action(**attr_dict)
 
     def get_chemical__decreases_expression_in_human_by__gene_symbol(self, gene_symbol):
         attr_dict = {
@@ -560,7 +560,7 @@ class Query(BaseDbManager):
             'action': "expression",
             'gene_symbol': gene_symbol
         }
-        return self.chem_gene_interaction_action(**attr_dict)
+        return self.get_chem_gene_interaction_action(**attr_dict)
 
     def get_pathway__by__gene_symbol(self, gene_symbol):
         r = self.session.query(models.GenePathway)\
