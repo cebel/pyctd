@@ -1,0 +1,8 @@
+# Test data for PyCTD
+#
+# Fields:
+# TypeName	Code	Description	ParentCode
+#
+TypeName1	Code1	Description1	ParentCode1
+TypeName2	Code2	Description2	ParentCode2
+TypeName3	Code3	Description3	ParentCode3

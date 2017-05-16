@@ -1,6 +1,6 @@
 """
 
-PyCTD is tested on both Python3
+PyCTD is tested on both Python2.7 and Python3
 
 .. warning:: PyCTD is not thoroughly tested on Windows.
 
@@ -15,8 +15,12 @@ Installation
 """
 
 from .manager.database import update
+from . import manager
 
-__all__ = ['update']
+
+query = manager.query.QueryManager()
+
+__all__ = ['update', 'query']
 
 __version__ = '0.0.2'
 
