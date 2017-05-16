@@ -13,5 +13,6 @@ include *.rst
 recursive-include tests *.gz
 recursive-include tests *.py
 recursive-include tests *.tsv
-
-
+recursive-include docs *.dot
+recursive-include docs *.png
+recursive-include docs *.svg
