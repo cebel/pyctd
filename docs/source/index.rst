@@ -134,7 +134,6 @@ Install with pip :code:`pip install -e .`
    overview
    installation
    quick_start
-   test
 
 .. toctree::
    :caption: Tutorial

@@ -8,3 +8,10 @@ recursive-include docs Makefile
 recursive-include src *.py
 
 global-exclude .idea .idea/*
+
+include *.rst
+recursive-include tests *.gz
+recursive-include tests *.py
+recursive-include tests *.tsv
+
+
