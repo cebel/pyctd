@@ -81,7 +81,7 @@ class   BaseDbManager:
                 log.info('load connection string from {}: {}'.format(config_file_path, connection))
             else:
                 with open(config_file_path, 'w') as config_file:
-                    connection = defaults.sqlalchemy_connection_string
+                    connection = defaults.sqlalchemy_connection_string_default
                     config['database'] = {'sqlalchemy_connection_string': connection}
                     config.write(config_file)
                     log.info('create configuration file {}'.format(config_file_path))
