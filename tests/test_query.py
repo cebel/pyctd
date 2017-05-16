@@ -15,14 +15,14 @@ import pyctd
 import shutil
 from pyctd.manager.database import table_conf
 from pyctd.constants import PYCTD_DATA_DIR
-from pyctd.manager.defaults import sqlalchemy_connection_string_4_tests
+from pyctd.manager.defaults import sqlalchemy_connection_string_default
 #sqlalchemy_connection_string_4_mysql, sqlalchemy_connection_string_4_mysql_tests
 
 log = logging.getLogger(__name__)
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 test_data_location = "data"
-connection = sqlalchemy_connection_string_4_tests
+connection = sqlalchemy_connection_string_default
 
 
 def download_urls(dummy1, dummy2):
