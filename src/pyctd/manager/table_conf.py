@@ -1,12 +1,17 @@
 # -*- coding: utf-8 -*-
 from collections import OrderedDict
 import re
+from . import models
 
 
 def standard_db_name(file_column_name):
-    """return a standard name
-    :param file_column_name: name of column in file
-    :type file_column_name: str
+    """return a standard name by following rules:
+    1. find all regular expression partners ((IDs)|(ID)|([A-Z][a-z]+)|([A-Z]{2,}))
+    2. lower very part and join again with _
+    This method is only used if values in table[model]['columns'] are str
+
+    :param str file_column_name: name of column in file
+    :return str: standard name
     """
     standard_name = file_column_name
     found = re.findall("((IDs)|(ID)|([A-Z][a-z]+)|([A-Z]{2,}))", file_column_name)
@@ -14,12 +19,12 @@ def standard_db_name(file_column_name):
         standard_name = '_'.join([x[0].lower() for x in found])
     return standard_name
 
-domains_to_map = ('chemical', 'pathway', 'gene', 'disease')
+models_to_map = (models.Chemical, models.Pathway, models.Gene, models.Disease)
 
 # ALERT: All strings in 'columns' and 'domain_id_column' will be translate by def standard_db_name into
 # (column_name_in_file, standard_column_name_in_db)
 tables = OrderedDict([
-    ("pathway", {
+    (models.Pathway, {
         "file_name": 'CTD_pathways.tsv.gz',
         "columns": [
             'PathwayName',
@@ -28,7 +33,7 @@ tables = OrderedDict([
         "domain_id_column": 'PathwayID'
     }),
 
-    ("gene", {
+    (models.Gene, {
         "file_name": 'CTD_genes.tsv.gz',
         "columns": [
             'GeneSymbol',
@@ -45,7 +50,7 @@ tables = OrderedDict([
         "domain_id_column": 'GeneID'
     }),
 
-    ("chemical", {
+    (models.Chemical, {
         "file_name": 'CTD_chemicals.tsv.gz',
         "columns": [
             'ChemicalName',
@@ -63,7 +68,7 @@ tables = OrderedDict([
         ),
     }),
 
-    ("disease", {
+    (models.Disease, {
         "file_name": 'CTD_diseases.tsv.gz',
         "columns": [
             'DiseaseName',
@@ -81,7 +86,7 @@ tables = OrderedDict([
         "domain_id_column": 'DiseaseID'
     }),
 
-    ("exposure_event", {
+    (models.ExposureEvent, {
         "file_name": 'CTD_exposure_events.tsv.gz',
         "columns": [
             #('exposurestressorname', 'chemical_name'),
@@ -131,7 +136,7 @@ tables = OrderedDict([
     }),
 
 
-    ("disease__pathway", {
+    (models.DiseasePathway, {
         "file_name": 'CTD_diseases_pathways.tsv.gz',
         "columns": [
             'DiseaseID',
@@ -140,7 +145,7 @@ tables = OrderedDict([
         ],
     }),
 
-    ("gene__pathway", {
+    (models.GenePathway, {
         "file_name": 'CTD_genes_pathways.tsv.gz',
         "columns": [
             'GeneID',
@@ -148,7 +153,7 @@ tables = OrderedDict([
         ],
     }),
 
-    ("chem__pathway_enriched", {
+    (models.ChemPathwayEnriched, {
         "file_name": 'CTD_chem_pathways_enriched.tsv.gz',
         "columns": [
             'ChemicalID',
@@ -162,7 +167,7 @@ tables = OrderedDict([
         ],
     }),
 
-    ("chem__go_enriched", {
+    (models.ChemGoEnriched, {
         "file_name": 'CTD_chem_go_enriched.tsv.gz',
         "columns": [
             'ChemicalID',
@@ -179,7 +184,7 @@ tables = OrderedDict([
         ],
     }),
 
-    ("action", {
+    (models.Action, {
         "file_name": 'CTD_chem_gene_ixn_types.tsv',
         "columns": [
             'TypeName',
@@ -189,7 +194,7 @@ tables = OrderedDict([
         ]
     }),
 
-    ("chem_gene_ixn", {
+    (models.ChemGeneIxn, {
         "file_name": 'CTD_chem_gene_ixns.tsv.gz',
         "columns": [
             'ChemicalID',
@@ -204,7 +209,7 @@ tables = OrderedDict([
         )
     }),
 
-    ("chemical__disease", {
+    (models.ChemicalDisease, {
         "file_name": 'CTD_chemicals_diseases.tsv.gz',
         "columns": [
             'DirectEvidence',
@@ -219,7 +224,7 @@ tables = OrderedDict([
         ),
     }),
 
-    ("gene__disease", {
+    (models.GeneDisease, {
         "file_name": 'CTD_genes_diseases.tsv.gz',
         "columns": [
             'GeneID',
@@ -236,14 +241,13 @@ tables = OrderedDict([
 
 ])
 
-for table_name in tables:
-    cols = tables[table_name]['columns']
+for model in tables:
+    cols = tables[model]['columns']
     for i in range(len(cols)):
         if isinstance(cols[i], str):
             cols[i] = (cols[i], standard_db_name(cols[i]))
-    if 'domain_id_column' in tables[table_name]:
-        d_id_col = tables[table_name]['domain_id_column']
+    if 'domain_id_column' in tables[model]:
+        d_id_col = tables[model]['domain_id_column']
         if isinstance(d_id_col, str):
-            tables[table_name]['domain_id_column'] = (d_id_col, standard_db_name(d_id_col))
-
+            tables[model]['domain_id_column'] = (d_id_col, standard_db_name(d_id_col))
 

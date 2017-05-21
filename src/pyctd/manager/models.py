@@ -6,11 +6,11 @@ fits the description in the table_conf module
     :target: _images/all.png
 """
 
-from sqlalchemy import Column, ForeignKey
-from sqlalchemy import Integer, String, Text, REAL
+from sqlalchemy import Column, ForeignKey, Integer, String, Text, REAL
 from sqlalchemy.ext.declarative import declarative_base
-from .defaults import TABLE_PREFIX
 from sqlalchemy.orm import relationship
+
+from .defaults import TABLE_PREFIX
 
 Base = declarative_base()
 
@@ -32,7 +32,8 @@ class Pathway(Base):
     
     `CTD link <http://ctdbase.org/downloads/#allpathways>`_
     """
-    __tablename__ = TABLE_PREFIX + "pathway"
+    table_suffix = "pathway"
+    __tablename__ = TABLE_PREFIX + table_suffix
     id = Column(Integer, primary_key=True)
 
     pathway_name = Column(String(255))
@@ -44,7 +45,8 @@ class Pathway(Base):
 
 class Action(Base):
     """Chemical–gene interaction types"""
-    __tablename__ = TABLE_PREFIX + "action"
+    table_suffix = "action"
+    __tablename__ = TABLE_PREFIX + table_suffix
     id = Column(Integer, primary_key=True)
 
     type_name = Column(String(255))
@@ -60,13 +62,14 @@ class Chemical(Base):
     """Chemical vocabulary
 
     .. image:: _static/models/chemical.png
-        :target: _images/chemical.png    
- 
+        :target: _images/chemical.png
+
     reference:
        - `CTD Help: Chemicals <http://ctdbase.org/help/chemDetailHelp.jsp>`_
-    
+
     """
-    __tablename__ = TABLE_PREFIX + "chemical"
+    table_suffix = "chemical"
+    __tablename__ = TABLE_PREFIX + table_suffix
     id = Column(Integer, primary_key=True)
 
     chemical_name = Column(String(255), index=True)
@@ -86,7 +89,8 @@ class Chemical(Base):
 
 class ChemicalParentid(Base):
     """Parent IDs of Chemical vocabulary"""
-    __tablename__ = TABLE_PREFIX + "chemical__parent_id"
+    table_suffix = "chemical__parent_id"
+    __tablename__ = TABLE_PREFIX + table_suffix
     id = Column(Integer, primary_key=True)
 
     chemical__id = foreign_key_to('chemical')
@@ -100,7 +104,8 @@ class ChemicalParentid(Base):
 
 class ChemicalTreenumber(Base):
     """Tree numbers of Chemical vocabulary"""
-    __tablename__ = TABLE_PREFIX + "chemical__tree_number"
+    table_suffix = "chemical__tree_number"
+    __tablename__ = TABLE_PREFIX + table_suffix
     id = Column(Integer, primary_key=True)
 
     chemical__id = foreign_key_to('chemical')
@@ -114,7 +119,8 @@ class ChemicalTreenumber(Base):
 
 class ChemicalParenttreenumber(Base):
     """Parent tree numbers of Chemical vocabulary"""
-    __tablename__ = TABLE_PREFIX + "chemical__parent_tree_number"
+    table_suffix = "chemical__parent_tree_number"
+    __tablename__ = TABLE_PREFIX + table_suffix
     id = Column(Integer, primary_key=True)
 
     chemical__id = foreign_key_to('chemical')
@@ -128,7 +134,8 @@ class ChemicalParenttreenumber(Base):
 
 class ChemicalDrugbank(Base):
     """DrugBank identifiers to Chemical vocabulary"""
-    __tablename__ = TABLE_PREFIX + "chemical__drugbank_id"
+    table_suffix = "chemical__drugbank_id"
+    __tablename__ = TABLE_PREFIX + table_suffix
     id = Column(Integer, primary_key=True)
 
     chemical__id = foreign_key_to('chemical')
@@ -142,7 +149,8 @@ class ChemicalDrugbank(Base):
 
 class ChemicalSynonym(Base):
     """Synonymy to Chemical vocabulary"""
-    __tablename__ = TABLE_PREFIX + "chemical__synonym"
+    table_suffix = "chemical__synonym"
+    __tablename__ = TABLE_PREFIX + table_suffix
     id = Column(Integer, primary_key=True)
 
     chemical__id = foreign_key_to('chemical')
@@ -156,15 +164,16 @@ class ChemicalSynonym(Base):
 
 class Disease(Base):
     """Disease vocabulary (MEDIC)
-    
+
     .. image:: _static/models/disease.png
         :target: _images/disease.png
-    
+
     reference:
         - `CTD Disease vocabulary (MEDIC); structure <http://ctdbase.org/downloads/#alldiseases>`_
         - `CTD description disease <http://ctdbase.org/help/diseaseDetailHelp.jsp>`_
     """
-    __tablename__ = TABLE_PREFIX + "disease"
+    table_suffix = "disease"
+    __tablename__ = TABLE_PREFIX + table_suffix
     id = Column(Integer, primary_key=True)
 
     disease_name = Column(String(255))  #: Disease name (str)
@@ -187,11 +196,12 @@ class Disease(Base):
 
 class DiseaseSynonym(Base):
     """Synonyms to Disease vocabulary (MEDIC)
-    
+
     reference:
         - `CTD Disease synonym <http://ctdbase.org/downloads/#alldiseases>`_
     """
-    __tablename__ = TABLE_PREFIX + "disease__synonym"
+    table_suffix = "disease__synonym"
+    __tablename__ = TABLE_PREFIX + table_suffix
     id = Column(Integer, primary_key=True)
 
     disease__id = foreign_key_to('disease')
@@ -205,11 +215,12 @@ class DiseaseSynonym(Base):
 
 class DiseaseAltdiseaseid(Base):
     """Alternative disease identifiers to Disease vocabulary (MEDIC)
-    
+
     reference:
         - `CTD Disease (alternative identifier) <http://ctdbase.org/downloads/#alldiseases>`_
     """
-    __tablename__ = TABLE_PREFIX + "disease__alt_disease_id"
+    table_suffix = "disease__alt_disease_id"
+    __tablename__ = TABLE_PREFIX + table_suffix
     id = Column(Integer, primary_key=True)
 
     disease__id = foreign_key_to('disease')
@@ -223,11 +234,12 @@ class DiseaseAltdiseaseid(Base):
 
 class DiseaseSlimmapping(Base):
     """MEDIC-Slim mappings to Disease vocabulary (MEDIC)
-    
+
     reference:
         - `CTD MEDIC-Slim mappings <http://ctdbase.org/downloads/#alldiseases>`_
     """
-    __tablename__ = TABLE_PREFIX + "disease__slim_mapping"
+    table_suffix = "disease__slim_mapping"
+    __tablename__ = TABLE_PREFIX + table_suffix
     id = Column(Integer, primary_key=True)
 
     disease__id = foreign_key_to('disease')
@@ -241,19 +253,20 @@ class DiseaseSlimmapping(Base):
 
 class Gene(Base):
     """Gene vocabulary
-    
+
     .. image:: _static/models/gene.png
         :target: _images/gene.png
-    
+
     reference:
-        - `CTD Gene <http://ctdbase.org/downloads/#allgenes>`_ 
+        - `CTD Gene <http://ctdbase.org/downloads/#allgenes>`_
         - `CTD Help: Genes <http://ctdbase.org/help/geneDetailHelp.jsp>`_
         - `UniProt accession numbers <http://www.uniprot.org/help/accession_numbers>`_
     """
-    __tablename__ = TABLE_PREFIX + "gene"
+    table_suffix = "gene"
+    __tablename__ = TABLE_PREFIX + table_suffix
     id = Column(Integer, primary_key=True)
 
-    gene_symbol = Column(String(255), index=True) #: gene_symbol"""
+    gene_symbol = Column(String(255), index=True)  #: gene_symbol"""
     gene_name = Column(Text)  #: gene name
     gene_id = Column(Integer)  #: NCBI Gene identifier
 
@@ -270,11 +283,12 @@ class Gene(Base):
 
 class GeneAltGeneId(Base):
     """Alternative gene identifiers to Gene vocabulary
-    
+
     reference:
         - `CTD alternative NCBI Gene identifiers <http://ctdbase.org/downloads/#allgenes>`_
     """
-    __tablename__ = TABLE_PREFIX + "gene__alt_gene_id"
+    table_suffix = "gene__alt_gene_id"
+    __tablename__ = TABLE_PREFIX + table_suffix
     id = Column(Integer, primary_key=True)
 
     gene__id = foreign_key_to('gene')
@@ -293,7 +307,8 @@ class GenePharmgkb(Base):
         - `CTD PharmGKBIDs <http://ctdbase.org/downloads/#allgenes>`_
         - `PharmGKB <https://www.pharmgkb.org/>`_
     """
-    __tablename__ = TABLE_PREFIX + "gene__pharmgkb_id"
+    table_suffix = "gene__pharmgkb_id"
+    __tablename__ = TABLE_PREFIX + table_suffix
     id = Column(Integer, primary_key=True)
 
     gene__id = foreign_key_to('gene')
@@ -310,9 +325,10 @@ class GeneUniprot(Base):
 
     reference:
         - `CTD UniProt <http://ctdbase.org/downloads/#allgenes>`_
-        - `UniProt <http://www.uniprot.org/>`_    
+        - `UniProt <http://www.uniprot.org/>`_
     """
-    __tablename__ = TABLE_PREFIX + "gene__uniprot_id"
+    table_suffix = "gene__uniprot_id"
+    __tablename__ = TABLE_PREFIX + table_suffix
     id = Column(Integer, primary_key=True)
 
     gene__id = foreign_key_to('gene')
@@ -326,12 +342,13 @@ class GeneUniprot(Base):
 
 class GeneBiogrid(Base):
     """BioGRID mappings to Gene vocabulary
-    
+
     reference:
         - `CTD BioGRID <http://ctdbase.org/downloads/#allgenes>`_
         - `BioGRID <https://thebiogrid.org/>`_
     """
-    __tablename__ = TABLE_PREFIX + "gene__biogrid_id"
+    table_suffix = "gene__biogrid_id"
+    __tablename__ = TABLE_PREFIX + table_suffix
     id = Column(Integer, primary_key=True)
 
     gene__id = foreign_key_to('gene')
@@ -345,11 +362,12 @@ class GeneBiogrid(Base):
 
 class GeneSynonym(Base):
     """Synonyms to Gene vocabulary
-    
+
     reference:
         - `CTD Synonyms <http://ctdbase.org/downloads/#allgenes>`_
     """
-    __tablename__ = TABLE_PREFIX + "gene__synonym"
+    table_suffix = "gene__synonym"
+    __tablename__ = TABLE_PREFIX + table_suffix
     id = Column(Integer, primary_key=True)
 
     gene__id = foreign_key_to('gene')
@@ -366,11 +384,12 @@ class ChemicalDisease(Base):
 
     .. image:: _static/models/chemicalDisease.png
         :target: _images/chemicalDisease.png
-            
+
     reference:
-        - `CTD Chemical–disease associations <http://ctdbase.org/downloads/#cd>`_ 
+        - `CTD Chemical–disease associations <http://ctdbase.org/downloads/#cd>`_
     """
-    __tablename__ = TABLE_PREFIX + "chemical__disease"
+    table_suffix = "chemical__disease"
+    __tablename__ = TABLE_PREFIX + table_suffix
     id = Column(Integer, primary_key=True)
 
     direct_evidence = Column(String(255), index=True)
@@ -396,11 +415,12 @@ class ChemicalDisease(Base):
 
 class ChemicalDiseaseOmim(Base):
     """Online Mendelian Inheritance in Man (OMIM) mappings to Chemical–disease associations
-    
+
     reference:
         - `CTD OMIM <http://ctdbase.org/downloads/#cd>`_
     """
-    __tablename__ = TABLE_PREFIX + "chemical__disease__omim_id"
+    table_suffix = "chemical__disease__omim_id"
+    __tablename__ = TABLE_PREFIX + table_suffix
     id = Column(Integer, primary_key=True)
 
     chemical__disease__id = foreign_key_to('chemical__disease')
@@ -409,11 +429,12 @@ class ChemicalDiseaseOmim(Base):
 
 class ChemicalDiseasePubmedid(Base):
     """PubMed Literature references to Chemical–disease associations
-    
+
     reference:
         - `CTD PubMed <http://ctdbase.org/downloads/#cd>`_
     """
-    __tablename__ = TABLE_PREFIX + "chemical__disease__pubmed_id"
+    table_suffix = "chemical__disease__pubmed_id"
+    __tablename__ = TABLE_PREFIX + table_suffix
     id = Column(Integer, primary_key=True)
 
     chemical__disease__id = foreign_key_to('chemical__disease')
@@ -422,11 +443,12 @@ class ChemicalDiseasePubmedid(Base):
 
 class ChemPathwayEnriched(Base):
     """Chemical–pathway enriched associations
-    
+
     reference:
         - `CTD Chemical–pathway enriched associations <http://ctdbase.org/downloads/#chempathwaysenriched>`_
     """
-    __tablename__ = TABLE_PREFIX + "chem__pathway_enriched"
+    table_suffix = "chem__pathway_enriched"
+    __tablename__ = TABLE_PREFIX + table_suffix
     id = Column(Integer, primary_key=True)
 
     p_value = Column(REAL)
@@ -454,12 +476,12 @@ class ChemGeneIxn(Base):
 
     .. image:: _static/models/chemGeneIxn.png
         :target: _images/chemGeneIxn.png
-    
+
     reference:
         - `CTD Chemical–gene interactions <http://ctdbase.org/downloads/#cg>`_
     """
-
-    __tablename__ = TABLE_PREFIX + "chem_gene_ixn"
+    table_suffix = "chem_gene_ixn"
+    __tablename__ = TABLE_PREFIX + table_suffix
     id = Column(Integer, primary_key=True)
 
     organism_id = Column(Integer, index=True)
@@ -483,13 +505,13 @@ class ChemGeneIxn(Base):
 
 
 class ChemGeneIxnGeneForm(Base):
-    """Gene forms of Chemical–gene interactions 
-    
+    """Gene forms of Chemical–gene interactions
+
     reference:
         - `CTD Gene forms of Chemical–gene interactions <http://ctdbase.org/downloads/#cg>`_
     """
-
-    __tablename__ = TABLE_PREFIX + "chem_gene_ixn__gene_form"
+    table_suffix = "chem_gene_ixn__gene_form"
+    __tablename__ = TABLE_PREFIX + table_suffix
     id = Column(Integer, primary_key=True)
 
     chem_gene_ixn__id = foreign_key_to('chem_gene_ixn')
@@ -501,12 +523,12 @@ class ChemGeneIxnGeneForm(Base):
 
 class ChemGeneIxnInteractionAction(Base):
     """Chemical–gene interactions actions
-    
+
     reference:
         - `CTD Chemical–gene interactions actions <http://ctdbase.org/downloads/#cg>`_
     """
-
-    __tablename__ = TABLE_PREFIX + "chem_gene_ixn__interaction_action"
+    table_suffix = "chem_gene_ixn__interaction_action"
+    __tablename__ = TABLE_PREFIX + table_suffix
     id = Column(Integer, primary_key=True)
 
     chem_gene_ixn__id = foreign_key_to('chem_gene_ixn')
@@ -518,12 +540,12 @@ class ChemGeneIxnInteractionAction(Base):
 
 class ChemGeneIxnPubmed(Base):
     """Chemical–gene interactions PubMed links
-    
+
     reference.
         - `CTD Chemical–gene interactions PubMed links <http://ctdbase.org/downloads/#cg>`_
     """
-
-    __tablename__ = TABLE_PREFIX + "chem_gene_ixn__pubmed_id"
+    table_suffix = "chem_gene_ixn__pubmed_id"
+    __tablename__ = TABLE_PREFIX + table_suffix
     id = Column(Integer, primary_key=True)
 
     chem_gene_ixn__id = foreign_key_to('chem_gene_ixn')
@@ -535,12 +557,12 @@ class ChemGeneIxnPubmed(Base):
 
 class ChemGoEnriched(Base):
     """Chemical–GO enriched associations
-    
+
     reference:
         - `CTD Chemical–GO enriched associations <http://ctdbase.org/downloads/#chemgoenriched>`_
     """
-
-    __tablename__ = TABLE_PREFIX + "chem__go_enriched"
+    table_suffix = "chem__go_enriched"
+    __tablename__ = TABLE_PREFIX + table_suffix
     id = Column(Integer, primary_key=True)
 
     ontology = Column(String(255))
@@ -570,11 +592,12 @@ class DiseasePathway(Base):
 
     .. image:: _static/models/diseasePathway.png
         :target: _images/diseasePathway.png
-    
+
     reference:
         - `CTD Disease–pathway associations <http://ctdbase.org/downloads/#diseasepathways>`_
     """
-    __tablename__ = TABLE_PREFIX + "disease__pathway"
+    table_suffix = "disease__pathway"
+    __tablename__ = TABLE_PREFIX + table_suffix
     id = Column(Integer, primary_key=True)
 
     pathway__id = foreign_key_to('pathway')
@@ -594,52 +617,53 @@ class DiseasePathway(Base):
 
 class ExposureEvent(Base):
     """Exposure–event associations
-    
+
     reference:
         - `CTD Exposure–event associations <http://ctdbase.org/downloads/#exposureevents>`_
     """
-    __tablename__ = TABLE_PREFIX + "exposure_event"
+    table_suffix = "exposure_event"
+    __tablename__ = TABLE_PREFIX + table_suffix
     id = Column(Integer, primary_key=True)
 
-    stressor_source_category = Column(Text)
-    stressor_source_details = Column(Text)
-    number_of_stressor_samples = Column(Text)
-    stress_or_notes = Column(Text)
-    number_of_receptors = Column(Text)
-    receptors = Column(Text)
-    receptor_notes = Column(Text)
-    smoking_status = Column(Text)
-    age = Column(Text)
-    age_units_of_measurement = Column(Text)
-    age_qualifier = Column(Text)
-    sex = Column(Text)
-    race = Column(Text)
-    methods = Column(Text)
-    detection_limit = Column(Text)
-    detection_limit_uom = Column(Text)
-    detection_frequency = Column(Text)
-    medium = Column(Text)
-    exposure_marker = Column(Text)
-    exposure_marker_id = Column(Text)
-    marker_level = Column(Text)
-    marker_units_of_measurement = Column(Text)
-    marker_measurement_statistic = Column(Text)
+    stressor_source_category = Column(String(255))
+    stressor_source_details = Column(String(255))
+    number_of_stressor_samples = Column(Integer)
+    stress_or_notes = Column(String(255))
+    number_of_receptors = Column(Integer)
+    receptors = Column(String(255))
+    receptor_notes = Column(String(255))
+    smoking_status = Column(String(255))
+    age = Column(String(255))
+    age_units_of_measurement = Column(String(255))
+    age_qualifier = Column(String(255))
+    sex = Column(String(255))
+    race = Column(String(255))
+    methods = Column(String(255))
+    detection_limit = Column(REAL)
+    detection_limit_uom = Column(String(255))
+    detection_frequency = Column(String(255))
+    medium = Column(String(255))
+    exposure_marker = Column(String(255))
+    exposure_marker_id = Column(String(255))
+    marker_level = Column(String(255))
+    marker_units_of_measurement = Column(String(255))
+    marker_measurement_statistic = Column(String(255))
     assay_notes = Column(Text)
     study_countries = Column(Text)
     state_or_province = Column(Text)
-    city_town_region_area = Column(Text)
-    exposure_event_notes = Column(Text)
-    outcome_relationship = Column(Text)
+    city_town_region_area = Column(String(255))
+    exposure_event_notes = Column(String(255))
+    outcome_relationship = Column(String(255))
     phenotype_name = Column(Text)
-    phenotype_id = Column(Text)
-    phenotype_action_degree_type = Column(Text)
-    anatomy = Column(Text)
+    phenotype_id = Column(String(255))
+    phenotype_action_degree_type = Column(String(255))
+    anatomy = Column(String(255))
     exposure_outcome_notes = Column(Text)
-    reference = Column(Text)
+    reference = Column(Integer)
     associated_study_titles = Column(Text)
-    enrollment_start_year = Column(Text)
-    enrollment_end_year = Column(Text)
-    study_factors = Column(Text)
+    enrollment_start_year = Column(Integer)
+    enrollment_end_year = Column(Integer)
+    study_factors = Column(String(255))
 
     disease__id = foreign_key_to('disease')
     chemical__id = foreign_key_to('chemical')
@@ -650,14 +674,15 @@ class ExposureEvent(Base):
 
 class GeneDisease(Base):
     """Gene–disease associations
-    
+
     .. image:: _static/models/geneDisease.png
         :target: _images/geneDisease.png
-    
+
     reference:
         - `CTD Gene–disease associations <http://ctdbase.org/downloads/#gd>`_
     """
-    __tablename__ = TABLE_PREFIX + "gene__disease"
+    table_suffix = "gene__disease"
+    __tablename__ = TABLE_PREFIX + table_suffix
     id = Column(Integer, primary_key=True)
 
     direct_evidence = Column(String(255))
@@ -687,7 +712,8 @@ class GeneDiseaseOmim(Base):
     reference:
         - `CTD OMIM mappings to Gene–disease associations <http://ctdbase.org/downloads/#gd>`_
     """
-    __tablename__ = TABLE_PREFIX + "gene__disease__omim_id"
+    table_suffix = "gene__disease__omim_id"
+    __tablename__ = TABLE_PREFIX + table_suffix
     id = Column(Integer, primary_key=True)
 
     gene__disease__id = foreign_key_to('gene__disease')
@@ -696,11 +722,12 @@ class GeneDiseaseOmim(Base):
 
 class GeneDiseasePubmed(Base):
     """PubMed references to Gene–disease associations
-    
+
     reference:
         - `CTD PubMed references to Gene–disease associations <http://ctdbase.org/downloads/#gd>`_
     """
-    __tablename__ = TABLE_PREFIX + "gene__disease__pubmed_id"
+    table_suffix = "gene__disease__pubmed_id"
+    __tablename__ = TABLE_PREFIX + table_suffix
     id = Column(Integer, primary_key=True)
 
     gene__disease__id = foreign_key_to('gene__disease')
@@ -712,11 +739,12 @@ class GeneDiseasePubmed(Base):
 
 class GenePathway(Base):
     """Gene–pathway associations
-    
+
     reference:
         - `CTD Gene–pathway associations <http://ctdbase.org/downloads/#genepathways>`_
     """
-    __tablename__ = TABLE_PREFIX + "gene__pathway"
+    table_suffix = "gene__pathway"
+    __tablename__ = TABLE_PREFIX + table_suffix
     id = Column(Integer, primary_key=True)
 
     pathway__id = foreign_key_to('pathway')

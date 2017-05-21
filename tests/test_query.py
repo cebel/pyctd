@@ -15,17 +15,21 @@ import pyctd
 import shutil
 from pyctd.manager.database import table_conf
 from pyctd.constants import PYCTD_DATA_DIR
-from pyctd.manager.defaults import sqlalchemy_connection_string_default
-#sqlalchemy_connection_string_4_mysql, sqlalchemy_connection_string_4_mysql_tests
+from pyctd.manager.defaults import sqlalchemy_connection_string_4_tests
 
 log = logging.getLogger(__name__)
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 test_data_location = "data"
-connection = sqlalchemy_connection_string_default
+connection = sqlalchemy_connection_string_4_tests
 
 
 def download_urls(dummy1, dummy2):
+    """
+    overwrites pyctd.manager.database.DbManager.download_urls in TestImport
+    :param dummy1: dummy parameter
+    :param dummy2: dummy parameter
+    """
     file_names = [x['file_name'] for x in list(table_conf.tables.values())]
     for file_name in file_names:
         test_file_path = os.path.join(dir_path, test_data_location, file_name)
@@ -112,7 +116,7 @@ class TestImport(unittest.TestCase):
 
     def test_get_chemicals(self):
         chemical = self.query.get_chemical()[0]
-        self.assertEqual(chemical.chemical_id, 'MESH:C000001')
+        self.assertEqual(chemical.chemical_id, 'ChemicalID1')
         self.assertEqual(chemical.chemical_name, 'ChemicalName1')
         self.assertEqual(chemical.cas_rn, 'CasRN1')
         self.session.commit()
@@ -141,7 +145,7 @@ class TestImport(unittest.TestCase):
         self.assertEqual(result, expected_result)
 
     def test_actions(self):
-        self.assertEqual(self.query.actions,['TypeName1', 'TypeName2', 'TypeName3'])
+        self.assertEqual(self.query.actions, ['TypeName1', 'TypeName2', 'TypeName3'])
 
     def test_pathways(self):
         pathways = [x.pathway_name for x in self.query.pathways]

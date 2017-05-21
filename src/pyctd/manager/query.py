@@ -99,8 +99,8 @@ class QueryManager(BaseDbManager):
         """helper function to add a query join to Pathway model
         
         :param `sqlalchemy.orm.query.Query` query: SQL Alchemy query  
-        :param pathway_id: pathway identifier
-        :param pathway_name: pathway name
+        :param str pathway_id: pathway identifier
+        :param str pathway_name: pathway name
         :return: `sqlalchemy.orm.query.Query` object
         """
         if pathway_id or pathway_name:
@@ -115,6 +115,7 @@ class QueryManager(BaseDbManager):
         """
         Get diseases
 
+        :param int limit: maximum number of results
         :param str disease_name: disease name
         :param str disease_id: disease identifier
         :param str definition: definition of disease
@@ -366,18 +367,18 @@ class QueryManager(BaseDbManager):
         """
         Get gene–disease associations 
 
-        :param str direct_evidence: direct evidence 
+        :param int gene_id: gene identifier
+        :param str gene_symbol: gene symbol
+        :param str gene_name:  gene name
+        :param str direct_evidence: direct evidence
         :param str inference_chemical_name: inference_chemical_name 
         :param float inference_score: inference score
-        :param str chemical_name: chemical name 
-        :param chemical_id: chemical identifier 
-        :param str cas_rn: CAS registry number
-        :param chemical_definition: chemical definition
-        :param disease_name: disease name 
+        :param str inference_chemical_name: chemical name
+        :param disease_name: disease name
         :param disease_id: disease identifier 
         :param disease_definition: disease definition 
         :param int limit: maximum number of results
-        :return: 
+        :return: list of :class:`pyctd.manager.database.models.GeneDisease` objects
 
         .. seealso::
             
@@ -420,7 +421,7 @@ class QueryManager(BaseDbManager):
         :param pathway_id: 
         :param pathway_name: 
         :param int limit: maximum number of results
-        :return: 
+        :return: list of :class:`pyctd.manager.database.models.DiseasePathway` objects
 
         .. seealso::
             
@@ -455,7 +456,7 @@ class QueryManager(BaseDbManager):
         :param disease_name: disease name 
         :param chemical_name: chemical name 
         :param int limit: maximum number of results
-        :return: [pyctd.manager.models.ChemicalDisease,]: list of PyCTD ChemicalDisease objects
+        :return: list of :class:`pyctd.manager.database.models.ChemicalDisease` objects
         
         .. seealso::
             
@@ -492,9 +493,9 @@ class QueryManager(BaseDbManager):
         :param str gene_symbol: gene symbol
         :param int gene_id: NCBI Gene identifier
         :param pathway_id: 
-        :param pathway_name: 
+        :param str pathway_name: pathway name
         :param int limit: maximum number of results
-        :return: 
+        :return: list of :class:`pyctd.manager.database.models.GenePathway` objects
 
         .. seealso::
             
@@ -526,7 +527,8 @@ class QueryManager(BaseDbManager):
     def get_therapeutic_chemical__by__disease_name(self, disease_name, limit=None):
         """
         Get therapeutic chemical by disease name
-        :param disease_name: 
+        :param limit:
+        :param disease_name:
         :return: therapeutic chemical
         :rtpye:  
         """

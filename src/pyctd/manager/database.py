@@ -13,32 +13,21 @@ from ..constants import PYCTD_DATA_DIR, PYCTD_DIR
 import os
 import re
 from urllib.parse import urlparse
-
+from configparser import RawConfigParser
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session
 from sqlalchemy.engine import reflection
 
+
 from . import defaults
 from . import models
 from . import table_conf
+from .table import get_table_configurations
 
 log = logging.getLogger(__name__)
 
 
-class Table:
-
-    def __init__(self, name, conf):
-        self.name = name
-        self.columns_in_file_expected = [x[0] for x in conf['columns']]
-        self.columns_in_db = [x[1] for x in conf['columns']]
-        self.columns_dict = dict(conf['columns'])
-        self.file_name = conf['file_name']
-        self.one_to_many = ()
-        if 'one_to_many' in conf:
-            self.one_to_many = conf['one_to_many']
-
-
-class   BaseDbManager:
+class BaseDbManager:
     """Creates a connection to database and a persistient session using SQLAlchemy"""
 
     def __init__(self, connection=None, echo=False):
@@ -72,23 +61,22 @@ class   BaseDbManager:
         :return: 
         """
         if not connection:
-            config_file_path = os.path.join(PYCTD_DIR, 'config.ini')
             config = configparser.ConfigParser()
-            
-            if os.path.exists(config_file_path):
-                log.info('fetch database configuration from {}'.format(config_file_path))
-                config.read(config_file_path)
+            cfp = defaults.config_file_path
+            if os.path.exists(cfp):
+                log.info('fetch database configuration from {}'.format(cfp))
+                config.read(cfp)
                 connection = config['database']['sqlalchemy_connection_string']
-                log.info('load connection string from {}: {}'.format(config_file_path, connection))
+                log.info('load connection string from {}: {}'.format(cfp, connection))
             else:
-                with open(config_file_path, 'w') as config_file:
+                with open(cfp, 'w') as config_file:
                     connection = defaults.sqlalchemy_connection_string_default
                     config['database'] = {'sqlalchemy_connection_string': connection}
                     config.write(config_file)
-                    log.info('create configuration file {}'.format(config_file_path))
+                    log.info('create configuration file {}'.format(cfp))
         return connection
 
-    def create_tables(self, checkfirst=True):
+    def _create_tables(self, checkfirst=True):
         """creates all tables from models in your database
         
         :param checkfirst: True or False check if tables already exists
@@ -98,7 +86,7 @@ class   BaseDbManager:
         log.info('create tables in {}'.format(self.engine.url))
         models.Base.metadata.create_all(self.engine, checkfirst=checkfirst)
 
-    def drop_tables(self):
+    def _drop_tables(self):
         """drops all tables in the database
 
         :return: 
@@ -107,6 +95,7 @@ class   BaseDbManager:
         self.session.commit()
         models.Base.metadata.drop_all(self.engine)
         self.session.commit()
+
 
 class DbManager(BaseDbManager):
     __mapper = {}
@@ -120,10 +109,7 @@ class DbManager(BaseDbManager):
         """
 
         BaseDbManager.__init__(self, connection=connection)
-        self.tables = []
-        for table_name, conf in table_conf.tables.items():
-            table = Table(table_name, conf)
-            self.tables.append(table)
+        self.tables = get_table_configurations()
 
     def db_import(self, urls=None, force_download=False):
         """Updates the CTD database
@@ -135,18 +121,21 @@ class DbManager(BaseDbManager):
         
         :param urls: iterable of URL strings
         :type urls: str
+        :param force_download: force method to download
+        :type: bool
         :return: SQL Alchemy model instance, populated with data from URL
         :rtype: :class:`models.Namespace`
         """
         if urls is None:
-            urls = defaults.urls
+            urls = [defaults.url_base + table_conf.tables[model]['file_name'] for model in table_conf.tables]
 
         log.info('Update CTD database from {}'.format(urls))
 
-        self.drop_tables()
+        self._drop_tables()
         DbManager.download_urls(urls, force_download)
-        self.create_tables()
+        self._create_tables()
         self.import_tables()
+        self.session.close()
 
     @property
     def mapper(self):
@@ -162,8 +151,9 @@ class DbManager(BaseDbManager):
         :rtype: dict of pandas.DataFrame
         """
         if not self.__mapper:
-            for domain in table_conf.domains_to_map:
-                tab_conf = table_conf.tables[domain]
+            for model in table_conf.models_to_map:
+                domain = model.table_suffix
+                tab_conf = table_conf.tables[model]
 
                 file_path = os.path.join(PYCTD_DATA_DIR, tab_conf['file_name'])
 
@@ -190,6 +180,7 @@ class DbManager(BaseDbManager):
     def import_tables(self, only_tables=(), exclude_tables=()):
         """Imports all data in database tables
         
+        :param exclude_tables: iterable of tables to be excluded
         :param only_tables: iterable of tables to be imported
         :type only_tables: iterable of str
         :return: 
@@ -237,9 +228,9 @@ class DbManager(BaseDbManager):
         return use_columns_with_index, column_names_in_db
 
     def import_table(self, table):
-        """
+        """import table by Table object
         
-        :param table: 
+        :param `manager.table_conf.Table` table: Table object
         :return: 
         """
         file_path = os.path.join(PYCTD_DATA_DIR, table.file_name)
@@ -252,7 +243,7 @@ class DbManager(BaseDbManager):
         )
         use_columns_with_index, column_names_in_db = r
 
-        self.import_table_in_db(file_path, use_columns_with_index, column_names_in_db, table.name)
+        self.import_table_in_db(file_path, use_columns_with_index, column_names_in_db, table)
 
         for column_in_file, column_in_one2many_table in table.one_to_many:
 
@@ -300,16 +291,16 @@ class DbManager(BaseDbManager):
                 column_in_one2many_table: child_values
             }).to_sql(name=o2m_table_name, if_exists='append', con=self.engine, index=False)
 
-    def import_table_in_db(self, file_path, use_columns_with_index, column_names_in_db, table_name):
+    def import_table_in_db(self, file_path, use_columns_with_index, column_names_in_db, table, pandas_dtypes=None):
         """Imports data from CTD file into database
         
-        :param file_path: path to file
-        :type file_path: str
+        :param table: `manager.table.Table` object
+        :param str file_path: path to file
         :param use_columns_with_index: list of column indices in file
         :type use_columns_with_index: list of int
         :param column_names_in_db: list of column names (have to fit to models except domain_id column name) 
         :type column_names_in_db: list of str
-        :param table_name: table name in database
+        :param dict pandas_dtypes: dictionary of pandas datatypse
         """
 
         chunks = pd.read_table(
@@ -318,17 +309,20 @@ class DbManager(BaseDbManager):
             names=column_names_in_db,
             header=None, comment='#',
             index_col=False,
-            chunksize=1000000)
+            chunksize=1000000,
+            dtype=pandas_dtypes
+        )
 
         for chunk in chunks:
             # this is an evil hack because CTD is not using the MESH prefix in this table
-            if table_name == 'exposure_event':
+            if table.name == 'exposure_event':
                 chunk.disease_id = 'MESH:' + chunk.disease_id
 
             chunk['id'] = chunk.index + 1
 
-            if table_name not in table_conf.domains_to_map:
-                for domain in table_conf.domains_to_map:
+            if table.model not in table_conf.models_to_map:
+                for model in table_conf.models_to_map:
+                    domain = model.table_suffix
                     domain_id = domain + "_id"
                     if domain_id in column_names_in_db:
                         chunk = pd.merge(chunk, self.mapper[domain], on=domain_id, how='left')
@@ -336,7 +330,7 @@ class DbManager(BaseDbManager):
 
             chunk.set_index('id', inplace=True)
 
-            table_with_prefix = defaults.TABLE_PREFIX + table_name
+            table_with_prefix = defaults.TABLE_PREFIX + table.name
             chunk.to_sql(name=table_with_prefix, if_exists='append', con=self.engine)
 
         del chunks
@@ -367,11 +361,14 @@ class DbManager(BaseDbManager):
         """Downloads all CTD URLs if it not exists
     
         :param urls: iterable of URL of CTD
+        :type urls: iterable
+        :param force_download: force method to download
+        :type force_download: bool
         """
         for url in urls:
             file_path = DbManager.get_path_to_file_from_url(url)
             if force_download or not os.path.exists(file_path):
-                log.info(('download {}').format(file_path))
+                log.info('download {}'.format(file_path))
                 urllib.request.urlretrieve(url, file_path)
 
     @staticmethod
@@ -382,15 +379,42 @@ class DbManager(BaseDbManager):
         """
         file_name = urlparse(url).path.split('/')[-1]
         return os.path.join(PYCTD_DATA_DIR, file_name)
-        
-
 
 
 def update(connection=None, urls=None, force_download=False):
     """Updates CTD database
 
-    :param urls iterable: list of urls to download 
-    :param connection str: custom database connection string
+    :param urls: list of urls to download
+    :type urls: iterable
+    :param connection: custom database connection string
+    :type connection: str
+    :param force_download: force method to download
+    :type force_download: bool
     """
 
-    DbManager(connection).db_import(urls, force_download)
+    db = DbManager(connection)
+    db.db_import(urls, force_download)
+    db.session.close()
+
+
+def set_mysql_connection(host='localhost', user='pyctd_user', passwd='pyctd_passwd', db='pyctd', charset='utf8'):
+    set_connection('mysql+pymysql://{user}:{passwd}@{host}/{db}?charset={charset}'
+                   .format(host=host, user=user, passwd=passwd, db=db, charset=charset))
+
+
+def set_test_connection():
+    set_connection(defaults.DEFAULT_SQLITE_TEST_DATABASE_NAME)
+
+
+def set_connection(connection=defaults.sqlalchemy_connection_string_default):
+    """
+    Set the connection string for sqlalchemy
+    :param str connection: sqlalchemy connection string
+    """
+    config = RawConfigParser()
+    config.read(defaults.config_file_path)
+    config.set('database', 'sqlalchemy_connection_string', connection)
+    with open(defaults.config_file_path, 'w') as configfile:
+        config.write(configfile)
+
+
