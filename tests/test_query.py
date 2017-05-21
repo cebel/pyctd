@@ -110,7 +110,7 @@ class TestImport(unittest.TestCase):
 
     def test_get_pathway(self):
         r = self.query.get_pathway()[0]
-        self.assertEqual(r.pathway_id, 'PathwayID:1')
+        self.assertEqual(r.pathway_id, 'PathwayID1')
         self.assertEqual(r.pathway_name, 'PathwayName1')
         self.session.commit()
 
