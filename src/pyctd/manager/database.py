@@ -17,7 +17,8 @@ from configparser import RawConfigParser
 from sqlalchemy import create_engine, inspect
 from sqlalchemy.orm import sessionmaker, scoped_session
 from sqlalchemy.engine import reflection
-
+from sqlalchemy.sql import sqltypes
+import numpy as np
 
 from . import defaults
 from . import models
@@ -26,6 +27,13 @@ from .table import get_table_configurations
 from ..constants import bcolors
 
 log = logging.getLogger(__name__)
+
+alchemy_pandas_dytpe_mapper = {
+    sqltypes.Text: np.unicode,
+    sqltypes.String: np.unicode,
+    sqltypes.Integer: np.float,
+    sqltypes.REAL: np.double
+}
 
 
 class BaseDbManager:
@@ -328,7 +336,7 @@ class DbManager(BaseDbManager):
 
     def get_dtypes(self,sqlalchemy_model):
         mapper = inspect(sqlalchemy_model)
-        dtypes = {x.key: type(x.type) for x in mapper.columns if x.key != 'id'}
+        dtypes = {x.key: alchemy_pandas_dytpe_mapper[type(x.type)] for x in mapper.columns if x.key != 'id'}
         return dtypes
 
 
