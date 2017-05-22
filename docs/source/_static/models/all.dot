@@ -819,15 +819,19 @@
         ></TD><TD ALIGN="LEFT"
         ><FONT FACE="Bitstream Vera Sans">INTEGER</FONT
         ></TD></TR> <TR><TD ALIGN="LEFT" BORDER="0"
-        ><FONT FACE="Bitstream Vera Sans">⚪ assay_level</FONT
+        ><FONT FACE="Bitstream Vera Sans">⚪ age</FONT
         ></TD><TD ALIGN="LEFT"
         ><FONT FACE="Bitstream Vera Sans">VARCHAR(255)</FONT
         ></TD></TR> <TR><TD ALIGN="LEFT" BORDER="0"
-        ><FONT FACE="Bitstream Vera Sans">⚪ assay_measurement_statistic</FONT
+        ><FONT FACE="Bitstream Vera Sans">⚪ age_qualifier</FONT
         ></TD><TD ALIGN="LEFT"
         ><FONT FACE="Bitstream Vera Sans">VARCHAR(255)</FONT
         ></TD></TR> <TR><TD ALIGN="LEFT" BORDER="0"
-        ><FONT FACE="Bitstream Vera Sans">⚪ assay_mediums</FONT
+        ><FONT FACE="Bitstream Vera Sans">⚪ age_units_of_measurement</FONT
+        ></TD><TD ALIGN="LEFT"
+        ><FONT FACE="Bitstream Vera Sans">VARCHAR(255)</FONT
+        ></TD></TR> <TR><TD ALIGN="LEFT" BORDER="0"
+        ><FONT FACE="Bitstream Vera Sans">⚪ anatomy</FONT
         ></TD><TD ALIGN="LEFT"
         ><FONT FACE="Bitstream Vera Sans">VARCHAR(255)</FONT
         ></TD></TR> <TR><TD ALIGN="LEFT" BORDER="0"
@@ -835,15 +839,67 @@
         ></TD><TD ALIGN="LEFT"
         ><FONT FACE="Bitstream Vera Sans">TEXT</FONT
         ></TD></TR> <TR><TD ALIGN="LEFT" BORDER="0"
-        ><FONT FACE="Bitstream Vera Sans">⚪ assay_units_of_measurement</FONT
+        ><FONT FACE="Bitstream Vera Sans">⚪ associated_study_titles</FONT
+        ></TD><TD ALIGN="LEFT"
+        ><FONT FACE="Bitstream Vera Sans">TEXT</FONT
+        ></TD></TR> <TR><TD ALIGN="LEFT" BORDER="0"
+        ><FONT FACE="Bitstream Vera Sans">⚪ city_town_region_area</FONT
         ></TD><TD ALIGN="LEFT"
         ><FONT FACE="Bitstream Vera Sans">VARCHAR(255)</FONT
         ></TD></TR> <TR><TD ALIGN="LEFT" BORDER="0"
-        ><FONT FACE="Bitstream Vera Sans">⚪ assayed_term_id</FONT
+        ><FONT FACE="Bitstream Vera Sans">⚪ detection_frequency</FONT
         ></TD><TD ALIGN="LEFT"
         ><FONT FACE="Bitstream Vera Sans">VARCHAR(255)</FONT
         ></TD></TR> <TR><TD ALIGN="LEFT" BORDER="0"
-        ><FONT FACE="Bitstream Vera Sans">⚪ assayed_term_name</FONT
+        ><FONT FACE="Bitstream Vera Sans">⚪ detection_limit</FONT
+        ></TD><TD ALIGN="LEFT"
+        ><FONT FACE="Bitstream Vera Sans">TEXT</FONT
+        ></TD></TR> <TR><TD ALIGN="LEFT" BORDER="0"
+        ><FONT FACE="Bitstream Vera Sans">⚪ detection_limit_uom</FONT
+        ></TD><TD ALIGN="LEFT"
+        ><FONT FACE="Bitstream Vera Sans">VARCHAR(255)</FONT
+        ></TD></TR> <TR><TD ALIGN="LEFT" BORDER="0"
+        ><FONT FACE="Bitstream Vera Sans">⚪ enrollment_end_year</FONT
+        ></TD><TD ALIGN="LEFT"
+        ><FONT FACE="Bitstream Vera Sans">INTEGER</FONT
+        ></TD></TR> <TR><TD ALIGN="LEFT" BORDER="0"
+        ><FONT FACE="Bitstream Vera Sans">⚪ enrollment_start_year</FONT
+        ></TD><TD ALIGN="LEFT"
+        ><FONT FACE="Bitstream Vera Sans">INTEGER</FONT
+        ></TD></TR> <TR><TD ALIGN="LEFT" BORDER="0"
+        ><FONT FACE="Bitstream Vera Sans">⚪ exposure_event_notes</FONT
+        ></TD><TD ALIGN="LEFT"
+        ><FONT FACE="Bitstream Vera Sans">VARCHAR(255)</FONT
+        ></TD></TR> <TR><TD ALIGN="LEFT" BORDER="0"
+        ><FONT FACE="Bitstream Vera Sans">⚪ exposure_marker</FONT
+        ></TD><TD ALIGN="LEFT"
+        ><FONT FACE="Bitstream Vera Sans">VARCHAR(255)</FONT
+        ></TD></TR> <TR><TD ALIGN="LEFT" BORDER="0"
+        ><FONT FACE="Bitstream Vera Sans">⚪ exposure_marker_id</FONT
+        ></TD><TD ALIGN="LEFT"
+        ><FONT FACE="Bitstream Vera Sans">VARCHAR(255)</FONT
+        ></TD></TR> <TR><TD ALIGN="LEFT" BORDER="0"
+        ><FONT FACE="Bitstream Vera Sans">⚪ exposure_outcome_notes</FONT
+        ></TD><TD ALIGN="LEFT"
+        ><FONT FACE="Bitstream Vera Sans">TEXT</FONT
+        ></TD></TR> <TR><TD ALIGN="LEFT" BORDER="0"
+        ><FONT FACE="Bitstream Vera Sans">⚪ marker_level</FONT
+        ></TD><TD ALIGN="LEFT"
+        ><FONT FACE="Bitstream Vera Sans">VARCHAR(255)</FONT
+        ></TD></TR> <TR><TD ALIGN="LEFT" BORDER="0"
+        ><FONT FACE="Bitstream Vera Sans">⚪ marker_measurement_statistic</FONT
+        ></TD><TD ALIGN="LEFT"
+        ><FONT FACE="Bitstream Vera Sans">VARCHAR(255)</FONT
+        ></TD></TR> <TR><TD ALIGN="LEFT" BORDER="0"
+        ><FONT FACE="Bitstream Vera Sans">⚪ marker_units_of_measurement</FONT
+        ></TD><TD ALIGN="LEFT"
+        ><FONT FACE="Bitstream Vera Sans">VARCHAR(255)</FONT
+        ></TD></TR> <TR><TD ALIGN="LEFT" BORDER="0"
+        ><FONT FACE="Bitstream Vera Sans">⚪ medium</FONT
+        ></TD><TD ALIGN="LEFT"
+        ><FONT FACE="Bitstream Vera Sans">VARCHAR(255)</FONT
+        ></TD></TR> <TR><TD ALIGN="LEFT" BORDER="0"
+        ><FONT FACE="Bitstream Vera Sans">⚪ methods</FONT
         ></TD><TD ALIGN="LEFT"
         ><FONT FACE="Bitstream Vera Sans">VARCHAR(255)</FONT
         ></TD></TR> <TR><TD ALIGN="LEFT" BORDER="0"
@@ -851,7 +907,15 @@
         ></TD><TD ALIGN="LEFT"
         ><FONT FACE="Bitstream Vera Sans">INTEGER</FONT
         ></TD></TR> <TR><TD ALIGN="LEFT" BORDER="0"
+        ><FONT FACE="Bitstream Vera Sans">⚪ number_of_stressor_samples</FONT
+        ></TD><TD ALIGN="LEFT"
+        ><FONT FACE="Bitstream Vera Sans">INTEGER</FONT
+        ></TD></TR> <TR><TD ALIGN="LEFT" BORDER="0"
         ><FONT FACE="Bitstream Vera Sans">⚪ outcome_relationship</FONT
+        ></TD><TD ALIGN="LEFT"
+        ><FONT FACE="Bitstream Vera Sans">VARCHAR(255)</FONT
+        ></TD></TR> <TR><TD ALIGN="LEFT" BORDER="0"
+        ><FONT FACE="Bitstream Vera Sans">⚪ phenotype_action_degree_type</FONT
         ></TD><TD ALIGN="LEFT"
         ><FONT FACE="Bitstream Vera Sans">VARCHAR(255)</FONT
         ></TD></TR> <TR><TD ALIGN="LEFT" BORDER="0"
@@ -861,9 +925,9 @@
         ></TD></TR> <TR><TD ALIGN="LEFT" BORDER="0"
         ><FONT FACE="Bitstream Vera Sans">⚪ phenotype_name</FONT
         ></TD><TD ALIGN="LEFT"
-        ><FONT FACE="Bitstream Vera Sans">VARCHAR(255)</FONT
+        ><FONT FACE="Bitstream Vera Sans">TEXT</FONT
         ></TD></TR> <TR><TD ALIGN="LEFT" BORDER="0"
-        ><FONT FACE="Bitstream Vera Sans">⚪ receptor_description</FONT
+        ><FONT FACE="Bitstream Vera Sans">⚪ race</FONT
         ></TD><TD ALIGN="LEFT"
         ><FONT FACE="Bitstream Vera Sans">VARCHAR(255)</FONT
         ></TD></TR> <TR><TD ALIGN="LEFT" BORDER="0"
@@ -871,15 +935,43 @@
         ></TD><TD ALIGN="LEFT"
         ><FONT FACE="Bitstream Vera Sans">VARCHAR(255)</FONT
         ></TD></TR> <TR><TD ALIGN="LEFT" BORDER="0"
+        ><FONT FACE="Bitstream Vera Sans">⚪ receptors</FONT
+        ></TD><TD ALIGN="LEFT"
+        ><FONT FACE="Bitstream Vera Sans">VARCHAR(255)</FONT
+        ></TD></TR> <TR><TD ALIGN="LEFT" BORDER="0"
         ><FONT FACE="Bitstream Vera Sans">⚪ reference</FONT
         ></TD><TD ALIGN="LEFT"
         ><FONT FACE="Bitstream Vera Sans">INTEGER</FONT
         ></TD></TR> <TR><TD ALIGN="LEFT" BORDER="0"
-        ><FONT FACE="Bitstream Vera Sans">⚪ stressor_agent_name</FONT
+        ><FONT FACE="Bitstream Vera Sans">⚪ sex</FONT
         ></TD><TD ALIGN="LEFT"
         ><FONT FACE="Bitstream Vera Sans">VARCHAR(255)</FONT
         ></TD></TR> <TR><TD ALIGN="LEFT" BORDER="0"
-        ><FONT FACE="Bitstream Vera Sans">⚪ study_location</FONT
+        ><FONT FACE="Bitstream Vera Sans">⚪ smoking_status</FONT
+        ></TD><TD ALIGN="LEFT"
+        ><FONT FACE="Bitstream Vera Sans">VARCHAR(255)</FONT
+        ></TD></TR> <TR><TD ALIGN="LEFT" BORDER="0"
+        ><FONT FACE="Bitstream Vera Sans">⚪ state_or_province</FONT
+        ></TD><TD ALIGN="LEFT"
+        ><FONT FACE="Bitstream Vera Sans">TEXT</FONT
+        ></TD></TR> <TR><TD ALIGN="LEFT" BORDER="0"
+        ><FONT FACE="Bitstream Vera Sans">⚪ stress_or_notes</FONT
+        ></TD><TD ALIGN="LEFT"
+        ><FONT FACE="Bitstream Vera Sans">VARCHAR(255)</FONT
+        ></TD></TR> <TR><TD ALIGN="LEFT" BORDER="0"
+        ><FONT FACE="Bitstream Vera Sans">⚪ stressor_source_category</FONT
+        ></TD><TD ALIGN="LEFT"
+        ><FONT FACE="Bitstream Vera Sans">VARCHAR(255)</FONT
+        ></TD></TR> <TR><TD ALIGN="LEFT" BORDER="0"
+        ><FONT FACE="Bitstream Vera Sans">⚪ stressor_source_details</FONT
+        ></TD><TD ALIGN="LEFT"
+        ><FONT FACE="Bitstream Vera Sans">VARCHAR(255)</FONT
+        ></TD></TR> <TR><TD ALIGN="LEFT" BORDER="0"
+        ><FONT FACE="Bitstream Vera Sans">⚪ study_countries</FONT
+        ></TD><TD ALIGN="LEFT"
+        ><FONT FACE="Bitstream Vera Sans">TEXT</FONT
+        ></TD></TR> <TR><TD ALIGN="LEFT" BORDER="0"
+        ><FONT FACE="Bitstream Vera Sans">⚪ study_factors</FONT
         ></TD><TD ALIGN="LEFT"
         ><FONT FACE="Bitstream Vera Sans">VARCHAR(255)</FONT
         ></TD></TR><TR><TD ALIGN="LEFT" BORDER="0"
@@ -1279,8 +1371,8 @@
 	"DiseasePathway" -> "Disease" [label = "disease__id"]
 	"DiseaseSlimmapping" -> "Disease" [label = "disease__id"]
 	"DiseaseSynonym" -> "Disease" [label = "disease__id"]
-	"ExposureEvent" -> "Chemical" [label = "chemical__id"]
 	"ExposureEvent" -> "Disease" [label = "disease__id"]
+	"ExposureEvent" -> "Chemical" [label = "chemical__id"]
 	"GeneAltGeneId" -> "Gene" [label = "gene__id"]
 	"GeneBiogrid" -> "Gene" [label = "gene__id"]
 	"GeneDisease" -> "Gene" [label = "gene__id"]
