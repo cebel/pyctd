@@ -451,10 +451,17 @@ def set_connection(connection=defaults.sqlalchemy_connection_string_default):
     Set the connection string for sqlalchemy
     :param str connection: sqlalchemy connection string
     """
+    cfp = defaults.config_file_path
     config = RawConfigParser()
-    config.read(defaults.config_file_path)
-    config.set('database', 'sqlalchemy_connection_string', connection)
-    with open(defaults.config_file_path, 'w') as configfile:
-        config.write(configfile)
+    if not os.path.exists():
+        with open(cfp, 'w') as config_file:
+            config['database'] = {'sqlalchemy_connection_string': connection}
+            config.write(config_file)
+            log.info('create configuration file {}'.format(cfp))
+    else:
+        config.read(cfp)
+        config.set('database', 'sqlalchemy_connection_string', connection)
+        with open(cfp, 'w') as configfile:
+            config.write(configfile)
 
 
