@@ -453,7 +453,7 @@ def set_connection(connection=defaults.sqlalchemy_connection_string_default):
     """
     cfp = defaults.config_file_path
     config = RawConfigParser()
-    if not os.path.exists():
+    if not os.path.exists(cfp):
         with open(cfp, 'w') as config_file:
             config['database'] = {'sqlalchemy_connection_string': connection}
             config.write(config_file)
