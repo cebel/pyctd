@@ -9,4 +9,3 @@ Maintainer
 Code Contributors
 -----------------
 - `Andrej Konotopez <https://github.com/lekono>`_
-- `Charles Tapley Hoyt <https://github.com/cthoyt>`_

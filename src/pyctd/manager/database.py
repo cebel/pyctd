@@ -14,7 +14,7 @@ import os
 import re
 from urllib.parse import urlparse
 from configparser import RawConfigParser
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, inspect
 from sqlalchemy.orm import sessionmaker, scoped_session
 from sqlalchemy.engine import reflection
 
@@ -23,6 +23,7 @@ from . import defaults
 from . import models
 from . import table_conf
 from .table import get_table_configurations
+from ..constants import bcolors
 
 log = logging.getLogger(__name__)
 
@@ -44,14 +45,44 @@ class BaseDbManager:
         formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
         handler.setFormatter(formatter)
         log.addHandler(handler)
-                
-        self.connection = self.get_connection_string(connection)
-        self.engine = create_engine(self.connection, echo=echo)
-        
-        self.inspector = reflection.Inspector.from_engine(self.engine)
-        
-        self.sessionmaker = sessionmaker(bind=self.engine, autoflush=False, expire_on_commit=False)
-        self.session = scoped_session(self.sessionmaker)()
+
+        try:
+            self.connection = self.get_connection_string(connection)
+            self.engine = create_engine(self.connection, echo=echo)
+            self.inspector = reflection.Inspector.from_engine(self.engine)
+            self.sessionmaker = sessionmaker(bind=self.engine, autoflush=False, expire_on_commit=False)
+            self.session = scoped_session(self.sessionmaker)()
+        except:
+            self.set_connection_string_by_user_input()
+            self.__init__()
+
+    def set_connection_string_by_user_input(self):
+        user_connection = input(
+            bcolors.WARNING + "\nFor any reason connection to " + bcolors.ENDC +
+            bcolors.FAIL + "{}".format(self.connection) + bcolors.ENDC +
+            bcolors.WARNING + " is not possible.\n\n" + bcolors.ENDC +
+            "For more information about SQLAlchemy connection strings go to:\n" +
+            "http://docs.sqlalchemy.org/en/latest/core/engines.html\n\n"
+            "Please insert a valid connection string:\n" +
+            bcolors.UNDERLINE + "Examples:\n\n" + bcolors.ENDC +
+            "MySQL (recommended):\n" +
+            bcolors.OKGREEN + "\tmysql+pymysql://user:passwd@localhost/database?charset=utf8\n" + bcolors.ENDC +
+            "PostgreSQL:\n" +
+            bcolors.OKGREEN + "\tpostgresql://scott:tiger@localhost/mydatabase\n" + bcolors.ENDC +
+            "MsSQL (pyodbc have to be installed):\n" +
+            bcolors.OKGREEN + "\tmssql+pyodbc://user:passwd@database\n" + bcolors.ENDC +
+            "SQLite (always works):\n" +
+            " - Linux:\n" +
+            bcolors.OKGREEN + "\tsqlite:////absolute/path/to/database.db\n" + bcolors.ENDC +
+            " - Windows:\n" +
+            bcolors.OKGREEN + "\tsqlite:///C:\\path\\to\\database.db\n" + bcolors.ENDC +
+            "Oracle:\n" +
+            bcolors.OKGREEN + "\toracle://user:passwd@127.0.0.1:1521/database\n\n" + bcolors.ENDC +
+            "[RETURN] for standard connection {}:\n".format(defaults.sqlalchemy_connection_string_default)
+        )
+        if not (user_connection or user_connection.strip()):
+            user_connection = defaults.sqlalchemy_connection_string_default
+        set_connection(user_connection.strip())
 
     @staticmethod
     def get_connection_string(connection=None):
@@ -167,7 +198,8 @@ class DbManager(BaseDbManager):
                     header=None,
                     usecols=[column_index],
                     comment='#',
-                    index_col=False
+                    index_col=False,
+                    dtype=self.get_dtypes(model)
                 )
 
                 if domain == 'chemical':
@@ -249,9 +281,9 @@ class DbManager(BaseDbManager):
 
             o2m_column_index = self.get_index_of_column(column_in_file, file_path)
 
-            self.import_one_to_many(file_path, o2m_column_index, table.name, column_in_one2many_table)
+            self.import_one_to_many(file_path, o2m_column_index, table, column_in_one2many_table)
 
-    def import_one_to_many(self, file_path, column_index, parent_table_name, column_in_one2many_table):
+    def import_one_to_many(self, file_path, column_index, parent_table, column_in_one2many_table):
         """
         
         :param file_path: 
@@ -266,7 +298,9 @@ class DbManager(BaseDbManager):
             header=None,
             comment='#',
             index_col=False,
-            chunksize=1000000)
+            chunksize=1000000,
+            dtype=self.get_dtypes(parent_table.model)
+        )
 
         for chunk in chunks:
             child_values = []
@@ -283,15 +317,22 @@ class DbManager(BaseDbManager):
                     parent_id_values.append(parent_id)
                     child_values.append(value.strip())
 
-            parent_id_column_name = parent_table_name + '__id'
-            o2m_table_name = defaults.TABLE_PREFIX + parent_table_name + '__' + column_in_one2many_table
+            parent_id_column_name = parent_table.name + '__id'
+            o2m_table_name = defaults.TABLE_PREFIX + parent_table.name + '__' + column_in_one2many_table
 
             pd.DataFrame({
                 parent_id_column_name: parent_id_values,
                 column_in_one2many_table: child_values
             }).to_sql(name=o2m_table_name, if_exists='append', con=self.engine, index=False)
 
-    def import_table_in_db(self, file_path, use_columns_with_index, column_names_in_db, table, pandas_dtypes=None):
+
+    def get_dtypes(self,sqlalchemy_model):
+        mapper = inspect(sqlalchemy_model)
+        dtypes = {x.key: type(x.type) for x in mapper.columns if x.key != 'id'}
+        return dtypes
+
+
+    def import_table_in_db(self, file_path, use_columns_with_index, column_names_in_db, table):
         """Imports data from CTD file into database
         
         :param table: `manager.table.Table` object
@@ -302,7 +343,6 @@ class DbManager(BaseDbManager):
         :type column_names_in_db: list of str
         :param dict pandas_dtypes: dictionary of pandas datatypse
         """
-
         chunks = pd.read_table(
             file_path,
             usecols=use_columns_with_index,
@@ -310,7 +350,7 @@ class DbManager(BaseDbManager):
             header=None, comment='#',
             index_col=False,
             chunksize=1000000,
-            dtype=pandas_dtypes
+            dtype=self.get_dtypes(table.model)
         )
 
         for chunk in chunks:

@@ -26,7 +26,7 @@ connection = sqlalchemy_connection_string_4_tests
 
 def download_urls(dummy1, dummy2):
     """
-    overwrites pyctd.manager.database.DbManager.download_urls in TestImport
+    overwrites pyctd.manager.database.DbManager.download_urls in TestImport.setup
     :param dummy1: dummy parameter
     :param dummy2: dummy parameter
     """

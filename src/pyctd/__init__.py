@@ -18,8 +18,7 @@ from . import manager
 from .manager.database import update
 from .manager.database import set_connection, set_mysql_connection
 
-
-query = manager.query.QueryManager()
+query = manager.query.QueryManager
 
 __all__ = ['update', 'query', 'set_connection', 'set_mysql_connection']
 

@@ -4,3 +4,4 @@ requests
 sqlalchemy
 click
 pymysql
+configparser

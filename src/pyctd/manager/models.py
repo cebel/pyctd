@@ -639,7 +639,7 @@ class ExposureEvent(Base):
     sex = Column(String(255))
     race = Column(String(255))
     methods = Column(String(255))
-    detection_limit = Column(REAL)
+    detection_limit = Column(Text)
     detection_limit_uom = Column(String(255))
     detection_frequency = Column(String(255))
     medium = Column(String(255))
