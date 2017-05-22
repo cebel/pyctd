@@ -29,8 +29,8 @@ from ..constants import bcolors
 log = logging.getLogger(__name__)
 
 alchemy_pandas_dytpe_mapper = {
-    sqltypes.Text: np.unicode,
-    sqltypes.String: np.unicode,
+    sqltypes.Text: np.object,
+    sqltypes.String: np.object,
     sqltypes.Integer: np.float,
     sqltypes.REAL: np.double
 }
