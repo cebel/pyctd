@@ -29,8 +29,8 @@ from ..constants import bcolors
 log = logging.getLogger(__name__)
 
 alchemy_pandas_dytpe_mapper = {
-    sqltypes.Text: np.object,
-    sqltypes.String: np.object,
+    sqltypes.Text: np.unicode,
+    sqltypes.String: np.unicode,
     sqltypes.Integer: np.float,
     sqltypes.REAL: np.double
 }
@@ -138,6 +138,7 @@ class BaseDbManager:
 
 class DbManager(BaseDbManager):
     __mapper = {}
+    pyctd_data_dir = PYCTD_DATA_DIR
 
     def __init__(self, connection=None):
         """The DbManager implements all function to upload CTD files into the database. Prefered SQL Alchemy 
@@ -194,7 +195,7 @@ class DbManager(BaseDbManager):
                 domain = model.table_suffix
                 tab_conf = table_conf.tables[model]
 
-                file_path = os.path.join(PYCTD_DATA_DIR, tab_conf['file_name'])
+                file_path = os.path.join(self.pyctd_data_dir, tab_conf['file_name'])
 
                 col_name_in_file, col_name_in_db = tab_conf['domain_id_column']
 
@@ -273,7 +274,7 @@ class DbManager(BaseDbManager):
         :param `manager.table_conf.Table` table: Table object
         :return: 
         """
-        file_path = os.path.join(PYCTD_DATA_DIR, table.file_name)
+        file_path = os.path.join(self.pyctd_data_dir, table.file_name)
         log.info('import CTD from file path {} data into table {}'.format(file_path, table.name))
 
         r = self.get_index_and_columns_order(
@@ -420,13 +421,13 @@ class DbManager(BaseDbManager):
                 urllib.request.urlretrieve(url, file_path)
 
     @staticmethod
-    def get_path_to_file_from_url(url):
+    def get_path_to_file_from_url(self, url):
         """standard file path
         
         :param str url: CTD download URL 
         """
         file_name = urlparse(url).path.split('/')[-1]
-        return os.path.join(PYCTD_DATA_DIR, file_name)
+        return os.path.join(DbManager.pyctd_data_dir, file_name)
 
 
 def update(connection=None, urls=None, force_download=False):

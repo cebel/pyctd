@@ -9,14 +9,14 @@ INSTALL_REQUIRES = [
 
 ENTRY_POINTS = {
     'console_scripts': [
-        'pybel = pybel.cli:main',
+        'pyctd = pyctd.cli:main',
     ]
 }
 
-# entry_points=ENTRY_POINTS,
+
 setup(
     name="pyctd",
-    version='0.0.2',
+    version='0.0.4',
     url='https://github.com/cebel/pyctd/',
     author='Christian Ebeling',
     author_email='chr.ebeling@gmail.com',
@@ -35,4 +35,5 @@ setup(
         'License :: OSI Approved :: MIT License',
         'Topic :: Database',
     ],
+    entry_points=ENTRY_POINTS,
 )

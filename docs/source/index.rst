@@ -155,6 +155,7 @@ Install with pip :code:`pip install -e .`
 
    roadmap
    technology
+   benchmarks
 
 Indices and tables
 ==================

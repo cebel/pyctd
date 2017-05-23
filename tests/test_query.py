@@ -9,11 +9,13 @@ from pyctd.manager.models import GeneAltGeneId, Pathway, DiseasePathway, Disease
     ChemicalTreenumber, ChemicalParentid, GeneUniprot, GeneSynonym, GenePharmgkb, GenePathway, GeneBiogrid, \
     DiseaseSynonym, DiseaseSlimmapping, DiseaseAltdiseaseid, Action, ChemGoEnriched, ChemicalParenttreenumber, \
     ChemPathwayEnriched, ExposureEvent
-
+from pyctd.manager.defaults import DEFAULT_SQLITE_TEST_DATABASE_NAME
 
 import pyctd
 import shutil
-from pyctd.manager.database import table_conf
+from pyctd.manager import table_conf
+from pyctd.manager.database import DbManager, BaseDbManager
+from pyctd.manager.query import QueryManager
 from pyctd.constants import PYCTD_DATA_DIR
 from pyctd.manager.defaults import sqlalchemy_connection_string_4_tests
 
@@ -23,6 +25,11 @@ dir_path = os.path.dirname(os.path.realpath(__file__))
 test_data_location = "data"
 connection = sqlalchemy_connection_string_4_tests
 
+# test data folder
+test_data_folder = os.path.join(PYCTD_DATA_DIR, 'tests')
+if not os.path.exists(test_data_folder):
+    os.mkdir(test_data_folder)
+
 
 def download_urls(dummy1, dummy2):
     """
@@ -30,19 +37,28 @@ def download_urls(dummy1, dummy2):
     :param dummy1: dummy parameter
     :param dummy2: dummy parameter
     """
+
     file_names = [x['file_name'] for x in list(table_conf.tables.values())]
     for file_name in file_names:
         test_file_path = os.path.join(dir_path, test_data_location, file_name)
-        destination_path = os.path.join(PYCTD_DATA_DIR, file_name)
+        destination_path = os.path.join(test_data_folder, file_name)
         shutil.copy(test_file_path, destination_path)
 
 
 class TestImport(unittest.TestCase):
-    def setUp(self):
-        pyctd.manager.database.DbManager.download_urls = download_urls
+    @classmethod
+    def setUpClass(cls):
+        DbManager.pyctd_data_dir = test_data_folder
+        DbManager.download_urls = download_urls
         pyctd.update(connection=connection)
-        self.query = pyctd.manager.query.QueryManager(connection=connection)
-        self.session = pyctd.manager.database.BaseDbManager(connection=connection).session
+        cls.query = QueryManager(connection=connection)
+        cls.session = BaseDbManager(connection=connection).session
+
+    @classmethod
+    def tearDownClass(cls):
+        os.remove(DEFAULT_SQLITE_TEST_DATABASE_NAME)
+        shutil.rmtree(test_data_folder)
+        cls.session.close()
 
     def test_number_of_inserts(self):
         models = [
@@ -187,5 +203,3 @@ class TestImport(unittest.TestCase):
     def get_action(self):
         action = self.query.get_action()[0]
 
-    def tearDown(self):
-        self.session.close()
