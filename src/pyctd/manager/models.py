@@ -76,6 +76,8 @@ class Chemical(Base):
     chemical_id = Column(String(255), index=True)
     cas_rn = Column(String(255), index=True)
     definition = Column(Text)
+    inchi = Column(Text)
+    isomeric_smiles = Column(Text)
 
     parent_ids = relationship("ChemicalParentid", back_populates="chemical")
     tree_numbers = relationship("ChemicalTreenumber", back_populates="chemical")

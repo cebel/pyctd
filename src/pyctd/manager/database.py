@@ -7,6 +7,7 @@ import io
 import gzip
 import configparser
 import urllib
+import pubchempy
 
 from ..constants import PYCTD_DATA_DIR, PYCTD_DIR
 
@@ -151,7 +152,7 @@ class DbManager(BaseDbManager):
         BaseDbManager.__init__(self, connection=connection)
         self.tables = get_table_configurations()
 
-    def db_import(self, urls=None, force_download=False):
+    def db_import(self, urls=None, force_download=False, add_inchis=True):
         """Updates the CTD database
         
         1. downloads all files from CTD
