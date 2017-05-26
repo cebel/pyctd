@@ -156,6 +156,7 @@ Install with pip :code:`pip install -e .`
    roadmap
    technology
    benchmarks
+   test4rtd
 
 Indices and tables
 ==================
