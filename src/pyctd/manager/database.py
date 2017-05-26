@@ -7,7 +7,6 @@ import io
 import gzip
 import configparser
 import urllib
-import pubchempy
 
 from ..constants import PYCTD_DATA_DIR, PYCTD_DIR
 
