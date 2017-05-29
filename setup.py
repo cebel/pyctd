@@ -1,18 +1,27 @@
 #!/usr/bin/env python
+
+import sys
+
 from setuptools import setup, find_packages
 
 PACKAGES = find_packages(where='src')
 
 INSTALL_REQUIRES = [
-    'sqlalchemy', 'pandas', 'pymysql'
+    'sqlalchemy',
+    'pandas',
+    'pymysql',
+    'requests',
+    'click',
 ]
+
+if sys.version_info < (3,):
+    INSTALL_REQUIRES.append('configparser')
 
 ENTRY_POINTS = {
     'console_scripts': [
         'pyctd = pyctd.cli:main',
     ]
 }
-
 
 setup(
     name="pyctd",
