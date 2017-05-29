@@ -9,8 +9,8 @@ python:
 
 env:
     matrix:
-      TOXENV=py
-      TOXENV=docs
+      - TOXENV=py
+      - TOXENV=docs
 
 matrix:
     include:
