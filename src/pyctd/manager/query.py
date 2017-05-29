@@ -9,8 +9,9 @@ from pandas import read_sql
 class QueryManager(BaseDbManager):
     """Query interface to database."""
 
-    def __limit_and_df(self, query, limit, as_df=False):
+    def _limit_and_df(self, query, limit, as_df=False):
         """adds a limit to any query (limit==None := no limit)
+        
         :param `sqlalchemy.orm.query.Query` query: SQL Alchemy query 
         :param int limit: maximum number of results
         :return list: query result of pyctd.manager.models.XY objects
@@ -25,7 +26,7 @@ class QueryManager(BaseDbManager):
 
         return results
 
-    def __join_gene(self, query, gene_name, gene_symbol, gene_id):
+    def _join_gene(self, query, gene_name, gene_symbol, gene_id):
         """helper function to add a query join to Gene model
         
         :param `sqlalchemy.orm.query.Query` query: SQL Alchemy query 
@@ -48,7 +49,7 @@ class QueryManager(BaseDbManager):
 
         return query
 
-    def __join_chemical(self, query, cas_rn, chemical_id, chemical_name, chemical_definition):
+    def _join_chemical(self, query, cas_rn, chemical_id, chemical_name, chemical_definition):
         """helper function to add a query join to Chemical model
         
         :param `sqlalchemy.orm.query.Query` query: SQL Alchemy query 
@@ -75,7 +76,7 @@ class QueryManager(BaseDbManager):
 
         return query
 
-    def __join_disease(self, query, disease_definition, disease_id, disease_name):
+    def _join_disease(self, query, disease_definition, disease_id, disease_name):
         """helper function to add a query join to Disease model
         
         :param `sqlalchemy.orm.query.Query` query: SQL Alchemy query 
@@ -98,7 +99,7 @@ class QueryManager(BaseDbManager):
 
         return query
 
-    def __join_pathway(self, query, pathway_id, pathway_name):
+    def _join_pathway(self, query, pathway_id, pathway_name):
         """helper function to add a query join to Pathway model
         
         :param `sqlalchemy.orm.query.Query` query: SQL Alchemy query  
@@ -160,7 +161,7 @@ class QueryManager(BaseDbManager):
         if alt_disease_id:
             q = q.join(models.DiseaseAltdiseaseid).filter(models.DiseaseAltdiseaseid.alt_disease_id == alt_disease_id)
 
-        return self.__limit_and_df(q, limit, as_df)
+        return self._limit_and_df(q, limit, as_df)
 
     def get_gene(self, gene_name=None, gene_symbol=None, gene_id=None, synonym=None, uniprot_id=None,
                  pharmgkb_id=None, biogrid_id=None, alt_gene_id=None, limit=None, as_df=False):
@@ -199,7 +200,7 @@ class QueryManager(BaseDbManager):
         if alt_gene_id:
             q = q.join(models.GeneAltGeneId.alt_gene_id == alt_gene_id)
 
-        return self.__limit_and_df(q, limit, as_df)
+        return self._limit_and_df(q, limit, as_df)
 
     def get_pathway(self, pathway_name=None, pathway_id=None, limit=None, as_df=False):
         """Get pathway
@@ -222,7 +223,7 @@ class QueryManager(BaseDbManager):
         if pathway_id:
             q = q.filter(models.Pathway.pathway_name.like(pathway_id))
 
-        return self.__limit_and_df(q, limit, as_df)
+        return self._limit_and_df(q, limit, as_df)
 
     def get_chemical(self, chemical_name=None, chemical_id=None, cas_rn=None, drugbank_id=None, parent_id=None,
                      parent_tree_number=None, tree_number=None, synonym=None, limit=None, as_df=False):
@@ -264,7 +265,7 @@ class QueryManager(BaseDbManager):
         if synonym:
             q = q.join(models.ChemicalSynonym).filter(models.ChemicalSynonym.synonym.like(synonym))
 
-        return self.__limit_and_df(q, limit, as_df)
+        return self._limit_and_df(q, limit, as_df)
 
     def get_chem_gene_interaction_actions(self, gene_name=None, gene_symbol=None, gene_id=None, limit=None,
                                           cas_rn=None, chemical_id=None, chemical_name=None, organism_id=None,
@@ -324,12 +325,12 @@ class QueryManager(BaseDbManager):
             q = q.join(models.ChemGeneIxnInteractionAction) \
                 .filter(models.ChemGeneIxnInteractionAction.interaction_action.like(interaction_action))
 
-        q = self.__join_gene(query=q, gene_name=gene_name, gene_symbol=gene_symbol, gene_id=gene_id)
+        q = self._join_gene(query=q, gene_name=gene_name, gene_symbol=gene_symbol, gene_id=gene_id)
 
-        q = self.__join_chemical(query=q, cas_rn=cas_rn, chemical_id=chemical_id, chemical_name=chemical_name,
-                                 chemical_definition=chemical_definition)
+        q = self._join_chemical(query=q, cas_rn=cas_rn, chemical_id=chemical_id, chemical_name=chemical_name,
+                                chemical_definition=chemical_definition)
 
-        return self.__limit_and_df(q, limit, as_df)
+        return self._limit_and_df(q, limit, as_df)
 
     @property
     def gene_forms(self):
@@ -400,12 +401,12 @@ class QueryManager(BaseDbManager):
         if inference_score:
             q = q.filter(models.GeneDisease.inference_score == inference_score)
 
-        q = self.__join_disease(query=q, disease_definition=disease_definition, disease_id=disease_id,
-                                disease_name=disease_name)
+        q = self._join_disease(query=q, disease_definition=disease_definition, disease_id=disease_id,
+                               disease_name=disease_name)
 
-        q = self.__join_gene(q, gene_name=gene_name, gene_symbol=gene_symbol, gene_id=gene_id)
+        q = self._join_gene(q, gene_name=gene_name, gene_symbol=gene_symbol, gene_id=gene_id)
 
-        return self.__limit_and_df(q, limit, as_df)
+        return self._limit_and_df(q, limit, as_df)
 
     @property
     def direct_evidences(self):
@@ -437,12 +438,12 @@ class QueryManager(BaseDbManager):
         """
         q = self.session.query(models.DiseasePathway)
 
-        q = self.__join_disease(query=q, disease_id=disease_id, disease_name=disease_name,
-                                disease_definition=disease_definition)
+        q = self._join_disease(query=q, disease_id=disease_id, disease_name=disease_name,
+                               disease_definition=disease_definition)
 
-        q = self.__join_pathway(query=q, pathway_id=pathway_id, pathway_name=pathway_name)
+        q = self._join_pathway(query=q, pathway_id=pathway_id, pathway_name=pathway_name)
 
-        return self.__limit_and_df(q, limit, as_df)
+        return self._limit_and_df(q, limit, as_df)
 
     def get_chemical_diseases(self, direct_evidence=None, inference_gene_symbol=None, inference_score=None,
                               inference_score_operator=None, cas_rn=None, chemical_name=None,
@@ -481,13 +482,13 @@ class QueryManager(BaseDbManager):
             elif inference_score_operator == "<":
                 q = q.filter_by(models.ChemicalDisease.inference_score > inference_score)
 
-        q = self.__join_chemical(q, cas_rn=cas_rn, chemical_id=chemical_id, chemical_name=chemical_name,
-                                 chemical_definition=chemical_definition)
+        q = self._join_chemical(q, cas_rn=cas_rn, chemical_id=chemical_id, chemical_name=chemical_name,
+                                chemical_definition=chemical_definition)
 
-        q = self.__join_disease(q, disease_definition=disease_definition, disease_id=disease_id,
-                                disease_name=disease_name)
+        q = self._join_disease(q, disease_definition=disease_definition, disease_id=disease_id,
+                               disease_name=disease_name)
 
-        return self.__limit_and_df(q, limit, as_df)
+        return self._limit_and_df(q, limit, as_df)
 
     def get_gene_pathways(self, gene_name=None, gene_symbol=None, gene_id=None, pathway_id=None,
                           pathway_name=None, limit=None, as_df=False):
@@ -510,24 +511,24 @@ class QueryManager(BaseDbManager):
             :class:`pyctd.manager.models.Pathway`
         """
         q = self.session.query(models.GenePathway)
-        q = self.__join_gene(q, gene_name=gene_name, gene_symbol=gene_symbol, gene_id=gene_id)
-        q = self.__join_pathway(q, pathway_id=pathway_id, pathway_name=pathway_name)
+        q = self._join_gene(q, gene_name=gene_name, gene_symbol=gene_symbol, gene_id=gene_id)
+        q = self._join_pathway(q, pathway_id=pathway_id, pathway_name=pathway_name)
 
-        return self.__limit_and_df(q, limit, as_df)
+        return self._limit_and_df(q, limit, as_df)
 
     def get_go_enriched__by__chemical_name(self, chemical_name, limit=None, as_df=False):
         q = self.session.query(models.ChemGoEnriched) \
             .join(models.Chemical) \
             .filter(models.Chemical.chemical_name == chemical_name) \
             .order_by(models.ChemGoEnriched.highest_go_level.desc(), models.ChemGoEnriched.corrected_p_value)
-        return self.__limit_and_df(q, limit, as_df)
+        return self._limit_and_df(q, limit, as_df)
 
     def get_pathway_enriched__by__chemical_name(self, chemical_name, limit=None, as_df=False):
         q = self.session.query(models.ChemPathwayEnriched) \
             .join(models.Chemical) \
             .filter(models.Chemical.chemical_name == chemical_name) \
             .order_by(models.ChemPathwayEnriched.corrected_p_value)
-        return self.__limit_and_df(q, limit, as_df)
+        return self._limit_and_df(q, limit, as_df)
 
     def get_therapeutic_chemical__by__disease_name(self, disease_name, limit=None, as_df=False):
         """
@@ -541,25 +542,25 @@ class QueryManager(BaseDbManager):
             .join(models.Disease) \
             .filter(models.Disease.disease_name == disease_name,
                     models.ChemicalDisease.direct_evidence == 'therapeutic')
-        return self.__limit_and_df(q, limit, as_df)
+        return self._limit_and_df(q, limit, as_df)
 
     def get_marker_chemical__by__disease_name(self, disease_name, limit=None, as_df=False):
         q = self.session.query(models.ChemicalDisease) \
             .join(models.Disease) \
             .filter(models.Disease.disease_name == disease_name,
                     models.ChemicalDisease.direct_evidence == 'marker/mechanism')
-        return self.__limit_and_df(q, limit, as_df)
+        return self._limit_and_df(q, limit, as_df)
 
     def get_chemical__by__disease(self, disease_name, limit=None, as_df=False):
         q = self.session.query(models.ChemicalDisease) \
             .join(models.Disease) \
             .filter(models.Disease.disease_name == disease_name) \
             .order_by(models.ChemicalDisease.inference_score.desc())
-        return self.__limit_and_df(q, limit, as_df)
+        return self._limit_and_df(q, limit, as_df)
 
     def get_action(self, limit=None, as_df=False):
         q = self.session.query(models.Action)
-        return self.__limit_and_df(q, limit, as_df)
+        return self._limit_and_df(q, limit, as_df)
 
     def get_exposure_event(self):
         pass
