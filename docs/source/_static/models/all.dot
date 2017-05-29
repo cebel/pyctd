@@ -334,6 +334,14 @@
         ><FONT FACE="Bitstream Vera Sans">⚪ definition</FONT
         ></TD><TD ALIGN="LEFT"
         ><FONT FACE="Bitstream Vera Sans">TEXT</FONT
+        ></TD></TR> <TR><TD ALIGN="LEFT" BORDER="0"
+        ><FONT FACE="Bitstream Vera Sans">⚪ inchi</FONT
+        ></TD><TD ALIGN="LEFT"
+        ><FONT FACE="Bitstream Vera Sans">TEXT</FONT
+        ></TD></TR> <TR><TD ALIGN="LEFT" BORDER="0"
+        ><FONT FACE="Bitstream Vera Sans">⚪ isomeric_smiles</FONT
+        ></TD><TD ALIGN="LEFT"
+        ><FONT FACE="Bitstream Vera Sans">TEXT</FONT
         ></TD></TR><TR><TD ALIGN="LEFT" BORDER="0"
         BGCOLOR="palegoldenrod"
         ><FONT FACE="Bitstream Vera Sans">⚪ drugbank_ids</FONT></TD

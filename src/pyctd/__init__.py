@@ -22,7 +22,7 @@ query = manager.query.QueryManager
 
 __all__ = ['update', 'query', 'set_connection', 'set_mysql_connection']
 
-__version__ = '0.0.2'
+__version__ = '0.4.0'
 
 __title__ = 'PyCTD'
 __description__ = 'Importing and querying CTD'

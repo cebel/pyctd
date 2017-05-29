@@ -7,7 +7,7 @@ recursive-include docs *.rst
 recursive-include docs Makefile
 recursive-include src *.py
 
-global-exclude .idea .idea/*
+global-exclude .idea .idea/* *.py[cod] __pycache__ *.so *.dylib .DS_Store
 
 include *.rst
 recursive-include tests *.gz
@@ -16,3 +16,5 @@ recursive-include tests *.tsv
 recursive-include docs *.dot
 recursive-include docs *.png
 recursive-include docs *.svg
+
+include *.rst *.txt *.yml LICENSE tox.ini docs/Makefile .coveragerc
