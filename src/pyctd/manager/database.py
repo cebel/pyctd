@@ -421,7 +421,7 @@ class DbManager(BaseDbManager):
                 urllib.request.urlretrieve(url, file_path)
 
     @staticmethod
-    def get_path_to_file_from_url(self, url):
+    def get_path_to_file_from_url(url):
         """standard file path
         
         :param str url: CTD download URL 
