@@ -91,3 +91,7 @@ ENV/
 # PyCharm settings
 .idea
 .idea/*
+
+# docs
+docs/build/
+docs/build/*
