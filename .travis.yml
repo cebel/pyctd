@@ -12,6 +12,11 @@ env:
     TOXENV=docs
     TOXENV=manifest
 
+matrix:
+    exclude:
+        - python: 2.7
+          env: TOXENV=manifest
+
 install:
     - pip install tox
 
