@@ -148,7 +148,7 @@ class DbManager(BaseDbManager):
         :type connection: str
         """
 
-        BaseDbManager.__init__(self, connection=connection)
+        super(DbManager, self).__init__(connection=connection)
         self.tables = get_table_configurations()
 
     def db_import(self, urls=None, force_download=False, add_inchis=True):

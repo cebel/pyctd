@@ -9,9 +9,6 @@ from pandas import read_sql
 class QueryManager(BaseDbManager):
     """Query interface to database."""
 
-    def __init__(self, connection=None):
-        BaseDbManager.__init__(self, connection=connection)
-
     def __limit_and_df(self, query, limit, as_df=False):
         """adds a limit to any query (limit==None := no limit)
         :param `sqlalchemy.orm.query.Query` query: SQL Alchemy query 
