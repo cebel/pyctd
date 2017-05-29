@@ -64,7 +64,7 @@ def setmysql(host,user,passwd,db,charset):
 
 @main.command()
 def getcon():
-    print(manager.database.BaseDbManager.get_connection_string())
+    click.echo(manager.database.BaseDbManager.get_connection_string())
 
 @main.group(help="PyBEL Data Manager Utilities")
 def manage():
