@@ -10,11 +10,12 @@ class QueryManager(BaseDbManager):
     """Query interface to database."""
 
     def _limit_and_df(self, query, limit, as_df=False):
-        """adds a limit to any query (limit==None := no limit)
-        
+        """adds a limit (limit==None := no limit) to any query and allow a return as pandas.DataFrame
+
+        :param bool as_df: if is set to True results return as pandas.DataFrame
         :param `sqlalchemy.orm.query.Query` query: SQL Alchemy query 
         :param int limit: maximum number of results
-        :return list: query result of pyctd.manager.models.XY objects
+        :return: query result of pyctd.manager.models.XY objects
         """
         if limit:
             query = query.limit(limit)
@@ -28,7 +29,7 @@ class QueryManager(BaseDbManager):
 
     def _join_gene(self, query, gene_name, gene_symbol, gene_id):
         """helper function to add a query join to Gene model
-        
+
         :param `sqlalchemy.orm.query.Query` query: SQL Alchemy query 
         :param str gene_name: gene name
         :param str gene_symbol: gene symbol
@@ -120,6 +121,7 @@ class QueryManager(BaseDbManager):
         """
         Get diseases
 
+        :param bool as_df: if set to True result returns as `pandas.DataFrame`
         :param int limit: maximum number of results
         :param str disease_name: disease name
         :param str disease_id: disease identifier
@@ -167,6 +169,7 @@ class QueryManager(BaseDbManager):
                  pharmgkb_id=None, biogrid_id=None, alt_gene_id=None, limit=None, as_df=False):
         """Get genes
 
+        :param bool as_df: if set to True result returns as `pandas.DataFrame`
         :param alt_gene_id: 
         :param str gene_name: gene name
         :param str gene_symbol: gene symbol
@@ -208,6 +211,7 @@ class QueryManager(BaseDbManager):
         .. note::
             Format of pathway_id is KEGG:X* or REACTOME:X* . X* stands for a sequence of digits
 
+        :param bool as_df: if set to True result returns as `pandas.DataFrame`
         :param str pathway_name: pathway name
         :param str pathway_id: KEGG or REACTOME identifier
         :param int limit: maximum number of results
@@ -229,6 +233,7 @@ class QueryManager(BaseDbManager):
                      parent_tree_number=None, tree_number=None, synonym=None, limit=None, as_df=False):
         """Get chemical
 
+        :param bool as_df: if set to True result returns as `pandas.DataFrame`
         :param str chemical_name: chemical name
         :param str chemical_id: cehmical identifier 
         :param str cas_rn: CAS registry number
@@ -281,6 +286,7 @@ class QueryManager(BaseDbManager):
         and actions ('activity', 'expression', ...  ). A complete list of all allowed
         interaction_actions can be retrieved via the attribute :attr:`~.interaction_actions`.
 
+        :param bool as_df: if set to True result returns as `pandas.DataFrame`
         :param str interaction_sentence: sentence describing the interactions 
         :param int organism_id: NCBI TaxTree identifier
         :param str chemical_name: chemical name
@@ -372,6 +378,7 @@ class QueryManager(BaseDbManager):
         """
         Get gene–disease associations 
 
+        :param bool as_df: if set to True result returns as `pandas.DataFrame`
         :param int gene_id: gene identifier
         :param str gene_symbol: gene symbol
         :param str gene_name:  gene name
@@ -419,8 +426,9 @@ class QueryManager(BaseDbManager):
 
     def get_disease_pathways(self, disease_id=None, disease_name=None, pathway_id=None, pathway_name=None,
                              disease_definition=None, limit=None, as_df=False):
-        """
+        """Get disease pathway link
         
+        :param bool as_df: if set to True result returns as `pandas.DataFrame`
         :param disease_id: 
         :param disease_name: 
         :param pathway_id: 
@@ -451,6 +459,7 @@ class QueryManager(BaseDbManager):
                               disease_id=None, disease_name=None, limit=None, as_df=False):
         """Get chemical–disease associations with inference gene
         
+        :param bool as_df: if set to True result returns as `pandas.DataFrame`
         :param chemical_id: 
         :param disease_id: 
         :param disease_definition: 
@@ -492,8 +501,9 @@ class QueryManager(BaseDbManager):
 
     def get_gene_pathways(self, gene_name=None, gene_symbol=None, gene_id=None, pathway_id=None,
                           pathway_name=None, limit=None, as_df=False):
-        """
+        """Get gene pathway link
         
+        :param bool as_df: if set to True result returns as `pandas.DataFrame`
         :param str gene_name: gene name 
         :param str gene_symbol: gene symbol
         :param int gene_id: NCBI Gene identifier
@@ -533,10 +543,12 @@ class QueryManager(BaseDbManager):
     def get_therapeutic_chemical__by__disease_name(self, disease_name, limit=None, as_df=False):
         """
         Get therapeutic chemical by disease name
-        :param limit:
-        :param disease_name:
+        
+        :param bool as_df: if set to True result returns as `pandas.DataFrame`
+        :param int limit: maximum number of results
+        :param str disease_name: disease name
         :return: therapeutic chemical
-        :rtpye:  
+        :rtpye: list[models.ChemicalDisease]
         """
         q = self.session.query(models.ChemicalDisease) \
             .join(models.Disease) \

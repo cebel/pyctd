@@ -42,7 +42,6 @@ class BaseDbManager:
     def __init__(self, connection=None, echo=False):
         """
         :param str connection: SQLAlchemy 
-        connection string
         :param bool echo: True or False for SQL output of SQLAlchemy engine
         """
         log.setLevel(logging.INFO)
