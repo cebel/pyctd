@@ -12,7 +12,7 @@ from ..constants import PYCTD_DATA_DIR, PYCTD_DIR
 
 import os
 import re
-from urllib.parse import urlparse
+from requests.compat import urlparse
 from configparser import RawConfigParser
 from sqlalchemy import create_engine, inspect
 from sqlalchemy.orm import sessionmaker, scoped_session
