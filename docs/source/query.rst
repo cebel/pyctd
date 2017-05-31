@@ -34,3 +34,9 @@ Properties:
     q.interaction_actions
     q.actions
     q.pathways
+
+Query Manager Reference
+-----------------------
+
+.. autoclass:: pyctd.manager.query.QueryManager
+    :members:
