@@ -61,7 +61,7 @@ author = 'Christian Ebeling'
 # built documents.
 #
 # The short X.Y version.
-version = '0.4.0-dev'
+version = '0.4.2-dev'
 # The full version, including alpha/beta/rc tags.
 release = '0.4.2-dev'
 

@@ -1,18 +1,24 @@
 # -*- coding: utf-8 -*-
 """PyCTD loads all CTD content in the database. Content is available via functions."""
 
+import sys
+if sys.version_info[0] == 3:
+    from urllib.request import urlretrieve
+    from requests.compat import urlparse
+else:
+    from urllib import urlretrieve
+    from urlparse import urlparse
+
 import logging
 import pandas as pd
 import io
 import gzip
 import configparser
-import urllib
 
 from ..constants import PYCTD_DATA_DIR, PYCTD_DIR
 
 import os
 import re
-from requests.compat import urlparse
 from configparser import RawConfigParser
 from sqlalchemy import create_engine, inspect
 from sqlalchemy.orm import sessionmaker, scoped_session
@@ -417,7 +423,7 @@ class DbManager(BaseDbManager):
             file_path = DbManager.get_path_to_file_from_url(url)
             if force_download or not os.path.exists(file_path):
                 log.info('download {}'.format(file_path))
-                urllib.request.urlretrieve(url, file_path)
+                urlretrieve(url, file_path)
 
     @staticmethod
     def get_path_to_file_from_url(url):
