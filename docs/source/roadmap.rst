@@ -8,7 +8,7 @@ Next steps:
 - flask restful API
 - Implment more query functions
 - Export of query results to different formats
-- Test for all supported :ref:`RDBMSs`
+- Test for all supported :ref:`rdbms`
 - Improve documentation and tutorials
 - Increase `code coverage <https://en.wikipedia.org/wiki/Code_coverage>`_
 - Collections of `Jupyter notebooks <http://jupyter.org/>`_ with examples
