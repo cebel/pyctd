@@ -1,5 +1,5 @@
-PyCTD
-=====
+PyCTD |stable_build| |stable_documentation|
+===========================================
 
 :code:`pyctd` is a Python software package that allows fast queries  and easy python access to CTD. It parses the
 original files and stores the content in a database. Thanks to SQLAlchemy data can be stored in different RDBMS
@@ -57,6 +57,6 @@ Links
     :target: https://travis-ci.org/cebel/pyctd
     :alt: Stable Build Status
 
-.. |develop_documentation| image:: https://readthedocs.org/projects/pyctd/badge/?version=latest
+.. |stable_documentation| image:: https://readthedocs.org/projects/pyctd/badge/?version=latest
     :target: http://pybel.readthedocs.io/en/latest/
     :alt: Development Documentation Status
