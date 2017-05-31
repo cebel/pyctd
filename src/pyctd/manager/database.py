@@ -36,7 +36,7 @@ alchemy_pandas_dytpe_mapper = {
 }
 
 
-class BaseDbManager:
+class BaseDbManager(object):
     """Creates a connection to database and a persistient session using SQLAlchemy"""
 
     def __init__(self, connection=None, echo=False):
