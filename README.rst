@@ -10,6 +10,7 @@ For more in for information about CTD go to
 `this section in the documentation <http://pyctd.readthedocs.io/en/latest/ctd.html>`_.
 
 This development is supported by following `IMI <https://www.imi.europa.eu/>`_ projects:
+
 - `AETIONOMY <http://www.aetionomy.eu/>`_ and
 - `PHAGO <http://www.phago.eu/>`_.
 
