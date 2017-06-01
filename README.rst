@@ -1,17 +1,27 @@
-PyCTD |stable_build| |stable_documentation| |pypi_license|
-==========================================================
-`PyBEL <http://pyctd.readthedocs.io>`_ is software library developed by the
+PyCTD |stable_build|
+====================
+
+|stable_documentation| |pypi_license|
+
+`PyBEL <http://pyctd.readthedocs.io>`_ is a Python package
+to access and query data provided by the `Comparative Toxicogenomics Database <http://ctdbase.org>`_.
+Data are installed  in a local RDBMS enabling bioinformatic algorithm very fast response times and high flexibility
+by using an SOLAlchemy database layer.
+It is developed by the
 `Department of Bioinformatics <https://www.scai.fraunhofer.de/en/business-research-areas/bioinformatics.html>`_
 at the Fraunhofer Institute for Algorithms and Scientific Computing
 `SCAI <https://www.scai.fraunhofer.de/en.html>`_
-to access and query data provided by the `Comparative Toxicogenomics Database <http://ctdbase.org>`_.
 For more in for information about CTD go to
 `this section in the documentation <http://pyctd.readthedocs.io/en/latest/ctd.html>`_.
+
+|er_model|
 
 This development is supported by following `IMI <https://www.imi.europa.eu/>`_ projects:
 
 - `AETIONOMY <http://www.aetionomy.eu/>`_ and
 - `PHAGO <http://www.phago.eu/>`_.
+
+|imi_logo| |aetionomy_logo| |phago_logo| |scai_logo|
 
 Getting Started
 ---------------
@@ -154,3 +164,23 @@ PyCTD
 
 .. |pypi_version| image:: https://img.shields.io/pypi/v/PyCTD.svg
     :alt: Current version on PyPI
+
+.. |phago_logo| image:: https://owncloud.scai.fraunhofer.de/index.php/apps/files_sharing/ajax/publicpreview.php?x=1920&y=562&a=true&file=phago-logo.jpg&t=7llp11KwSiuXYOh&scalingup=0
+    :target: https://www.imi.europa.eu/content/phago
+    :alt: PHAGO project logo
+
+.. |aetionomy_logo| image:: https://owncloud.scai.fraunhofer.de/index.php/apps/files_sharing/ajax/publicpreview.php?x=1920&y=562&a=true&file=aetionomy-logo.png&t=5ClUGTZRAYkeb7m&scalingup=0
+    :target: http://www.aetionomy.eu/en/vision.html
+    :alt: AETIONOMY project logo
+
+.. |imi_logo| image:: https://owncloud.scai.fraunhofer.de/index.php/apps/files_sharing/ajax/publicpreview.php?x=1920&y=562&a=true&file=imi-logo.png&t=Uvw79bTxGyd07oo&scalingup=0
+    :target: https://www.imi.europa.eu/
+    :alt: IMI project logo
+
+.. |scai_logo| image:: https://owncloud.scai.fraunhofer.de/index.php/apps/files_sharing/ajax/publicpreview.php?x=1920&y=562&a=true&file=scai-logo.png&t=fyJo2GzFDLNypho&scalingup=0
+    :target: https://www.scai.fraunhofer.de/en/business-research-areas/bioinformatics.html
+    :alt: SCAI project logo
+
+.. |er_model| image:: https://owncloud.scai.fraunhofer.de/index.php/apps/files_sharing/ajax/publicpreview.php?x=1920&y=562&a=true&file=pyctd_er_model.png&t=QUm8KPPnNGoH8wp&scalingup=0
+    :target: http://pyctd.readthedocs.io/en/latest/
+    :alt: Entity relationship model
