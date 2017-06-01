@@ -17,8 +17,8 @@ Getting Started
 ---------------
 This is a quick start tutorial for impatient.
 
-Installation
-~~~~~~~~~~~~
+Installation |pypi_version| |python_versions|
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 PyCTD can be installed with `pip <https://pip.pypa.io/en/stable/>`_.
 
 .. code-block:: bash
@@ -148,3 +148,9 @@ PyCTD
 
 .. |pypi_license| image:: https://img.shields.io/pypi/l/PyCTD.svg
     :alt: Apache 2.0 License
+
+.. |python_versions| image:: https://img.shields.io/pypi/pyversions/PyCTD.svg
+    :alt: Stable Supported Python Versions
+
+.. |pypi_version| image:: https://img.shields.io/pypi/v/PyCTD.svg
+    :alt: Current version on PyPI
