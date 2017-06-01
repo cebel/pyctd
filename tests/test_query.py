@@ -30,7 +30,7 @@ test_data_folder = os.path.join(PYCTD_DATA_DIR, 'tests')
 if not os.path.exists(test_data_folder):
     os.mkdir(test_data_folder)
 
-
+@staticmethod
 def download_urls(dummy1, dummy2):
     """
     overwrites pyctd.manager.database.DbManager.download_urls in TestImport.setup
