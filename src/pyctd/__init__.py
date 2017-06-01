@@ -7,11 +7,9 @@ PyCTD is tested on both Python2.7 and Python3
 Installation
 ------------
 
-.. code-block:: sh
+.. code-block:: bash
 
-   $ git clone https://github.com/cebel/pyctd.git
-   $ cd pyctd
-   $ pip3 install -e .
+    pip install pyctd
 """
 
 from . import manager
@@ -22,7 +20,7 @@ query = manager.query.QueryManager
 
 __all__ = ['update', 'query', 'set_connection', 'set_mysql_connection']
 
-__version__ = '0.4.5'
+__version__ = '0.4.9'
 
 __title__ = 'PyCTD'
 __description__ = 'Importing and querying CTD'

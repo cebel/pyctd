@@ -1,6 +1,5 @@
 PyCTD |stable_build| |stable_documentation| |pypi_license|
 ==========================================================
-
 `PyBEL <http://pyctd.readthedocs.io>`_ is software library developed by the
 `Department of Bioinformatics <https://www.scai.fraunhofer.de/en/business-research-areas/bioinformatics.html>`_
 at the Fraunhofer Institute for Algorithms and Scientific Computing
@@ -16,12 +15,10 @@ This development is supported by following `IMI <https://www.imi.europa.eu/>`_ p
 
 Getting Started
 ---------------
-
 This is a quick start tutorial for impatient.
 
 Installation
 ~~~~~~~~~~~~
-
 PyCTD can be installed with `pip <https://pip.pypa.io/en/stable/>`_.
 
 .. code-block:: bash
@@ -42,23 +39,22 @@ If you want to make sure you are installing this under python3 use ...
 
 SQLite
 ~~~~~~
-
 .. note:: If you want to use SQLite as your database system, because you ...
 
     - have no possibility to use RDMSs like MySQL/MariaDB
     - just test pyctd, but don't want to spend time in setting up a database
+
     skip the next *MySQL/MariaDB setup* section. But in general we recommend MySQL or MariaDB as your RDBMS.
 
 If you don't know what all that means skip the section *MySQL/MariaDB setup*.
 
 Don't worry! You can always later change the configuration. For more information about
-changing database system later go to
-`Changing database configuration <http://pyctd.readthedocs.io/en/latest/installation.html#changing-database-configuration>`_
+changing database system later go to the subtitle *Changing database configuration*
+`Changing database configuration <http://pyctd.readthedocs.io/en/latest/installation.html>`_
 in the documentation on readthedocs.
 
 MySQL/MariaDB setup
 ~~~~~~~~~~~~~~~~~~~
-
 Log in MySQL as root user and create a new database, create a user, assign the rights and flush privileges.
 
 .. code-block:: mysql
@@ -84,7 +80,6 @@ If you have used you own settings, please adapt the following command to you req
 
 Updating
 ~~~~~~~~
-
 The updating process will download the files provided by the CTD team on the
 `download page <http://ctdbase.org/downloads/>`_
 
@@ -97,7 +92,6 @@ The updating process will download the files provided by the CTD team on the
 
 Test a query function
 ~~~~~~~~~~~~~~~~~~~~~
-
 .. code-block:: python
 
     >>> query = pyctd.query()
@@ -111,22 +105,13 @@ Test a query function
     [DB014043]
 
 
-Installation
-------------
-
-PyCTD can be installed easily from `PyPI <https://pypi.python.org/pypi/pyctd>`_ with the following code in
-your favorite terminal:
-
-.. code-block:: sh
-
-   python3 -m pip install pyctd
-
+More information
+----------------
 See the `installation documentation <http://pyctd.readthedocs.io/en/latest/installation.html>`_ for more advanced
 instructions. Also, check the change log at :code:`CHANGELOG.rst`.
 
 CTD tools and licence (use of data)
 -----------------------------------
-
 CTD provides also many online `query interfaces <http://ctdbase.org/search/>`_ and
 `tools to analyse data <http://ctdbase.org/tools/>`_ on their website.
 
@@ -141,8 +126,8 @@ Links
 -----
 Comparative Toxicogenomics Database (CTD)
 
-- `CTD website http://ctdbase.org/`_
-- `All CTD publications <http://ctdbase.org/about/publications/#ctdpubs>`_
+- `CTD website <http://ctdbase.org/>`_
+- `All CTD publications <http://ctdbase.org/about/publications/>`_
 - `CTD download page <http://ctdbase.org/downloads/>`_
 
 PyCTD

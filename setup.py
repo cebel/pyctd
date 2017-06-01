@@ -8,6 +8,8 @@ import codecs
 
 PACKAGES = find_packages(where='src')
 
+KEYWORDS = ['Toxicogenomics', 'Database', 'Bioinformatics', 'Human health' ]
+
 INSTALL_REQUIRES = [
     'sqlalchemy',
     'pandas',
@@ -47,6 +49,13 @@ def find_meta(meta):
         return meta_match.group(1)
     raise RuntimeError('Unable to find __{meta}__ string'.format(meta=meta))
 
+
+def get_long_description():
+    """Get the long_description from the README.rst file. Assume UTF-8 encoding."""
+    with codecs.open(os.path.join(HERE, 'README.rst'), encoding='utf-8') as f:
+        long_description = f.read()
+    return long_description
+
 setup(
     name=find_meta('title'),
     version=find_meta('version'),
@@ -56,17 +65,25 @@ setup(
     maintainer='Christian Ebeling',
     maintainer_email=find_meta('email'),
     description=find_meta('description'),
+    long_description=get_long_description(),
+    keywords=KEYWORDS,
     license=find_meta('license'),
     packages=PACKAGES,
     install_requires=INSTALL_REQUIRES,
     package_dir={'': 'src'},
     classifiers=[
         'Development Status :: 5 - Production/Stable',
-        'Programming Language :: Python :: 3',
+        'Operating System :: OS Independent',
+        'Environment :: Console',
+        'Programming Language :: Python',
+        'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: MIT License',
         'Topic :: Database',
+        "Topic :: Scientific/Engineering :: Bio-Informatics",
     ],
     entry_points=ENTRY_POINTS,
 )
