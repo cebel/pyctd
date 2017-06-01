@@ -20,3 +20,4 @@ recursive-include docs *.png
 recursive-include docs *.svg
 
 include *.rst *.txt *.yml LICENSE tox.ini docs/Makefile .coveragerc
+exclude docs/build
