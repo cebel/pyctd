@@ -70,8 +70,8 @@ Start a python shell and set the MySQL configuration. If you have not changed an
 
 .. code-block:: python
 
-    >>> import pyctd
-    >>> pyctd.set_mysql_connection()
+    import pyctd
+    pyctd.set_mysql_connection()
 
 If you have used you own settings, please adapt the following command to you requirements.
 
@@ -139,11 +139,13 @@ MDI Biological Laboratory and NC State University.
 Links
 -----
 Comparative Toxicogenomics Database (CTD)
+
 - `CTD website http://ctdbase.org/`_
 - `All CTD publications <http://ctdbase.org/about/publications/#ctdpubs>`_
 - `CTD download page <http://ctdbase.org/downloads/>`_
 
 PyCTD
+
 - Documented on `Read the Docs <http://pyctd.readthedocs.io/>`_
 - Versioned on `GitHub <https://github.com/cebel/pyctd>`_
 - Tested on `Travis CI <https://travis-ci.org/cebel/pyctd>`_
