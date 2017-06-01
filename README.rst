@@ -13,18 +13,6 @@ This development is supported by following `IMI <https://www.imi.europa.eu/>`_ p
 - `AETIONOMY <http://www.aetionomy.eu/>`_ and
 - `PHAGO <http://www.phago.eu/>`_.
 
-.. image:: http://www.imi.europa.eu/webfm_send/1714
-   :width: 150 px
-   :target: http://www.imi.europa.eu
-
-.. image:: http://www.aetionomy.eu/content/dam/scai/AETIONOMY/Logo-Aetionomy.png
-   :width: 150 px
-   :target: http://www.aetionomy.eu/en/vision.html
-
-.. image:: https://www.scai.fraunhofer.de/content/dam/scai/scai_logo.svg
-   :width: 150 px
-   :target: https://www.scai.fraunhofer.de/en/business-research-areas/bioinformatics.html
-
 Getting Started
 ---------------
 
