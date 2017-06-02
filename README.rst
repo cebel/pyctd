@@ -3,11 +3,12 @@ PyCTD |stable_build|
 
 |stable_documentation| |pypi_license|
 
-`PyBEL <http://pyctd.readthedocs.io>`_ is a Python package
-to access and query data provided by the `Comparative Toxicogenomics Database <http://ctdbase.org>`_.
-Data are installed  in a local RDBMS enabling bioinformatic algorithm very fast response times and high flexibility
-by using an SOLAlchemy database layer.
-It is developed by the
+`PyCTD <http://pyctd.readthedocs.io>`_ is a Python package
+to access and query chemical–gene/protein interactions, chemical–disease and gene–disease
+relationships by data provided by the `Comparative Toxicogenomics Database <http://ctdbase.org>`_ .
+Data are installed in a (local or remte) RDBMS enabling bioinformatic algorithms very fast response times
+to sophisticated queries and high flexibility by using SOLAlchemy database layer.
+PyCTD is developed by the
 `Department of Bioinformatics <https://www.scai.fraunhofer.de/en/business-research-areas/bioinformatics.html>`_
 at the Fraunhofer Institute for Algorithms and Scientific Computing
 `SCAI <https://www.scai.fraunhofer.de/en.html>`_
@@ -22,6 +23,22 @@ This development is supported by following `IMI <https://www.imi.europa.eu/>`_ p
 - `PHAGO <http://www.phago.eu/>`_.
 
 |imi_logo| |aetionomy_logo| |phago_logo| |scai_logo|
+
+Supported databases
+-------------------
+
+`PyCTD` uses `SQLAlchemy <http://sqlalchemy.readthedocs.io>`_ to cover a wide spectrum of RDMSs
+(Relational database management system). For best performance MySQL or MariaDB is recommended. But if you have no
+possibility to install software on your system SQLite - which needs no further
+installation - also works. Following RDMSs are supported (by SQLAlchemy):
+
+1. Firebird
+2. Microsoft SQL Server
+3. MySQL / `MariaDB <https://mariadb.org/>`_
+4. Oracle
+5. PostgreSQL
+6. SQLite
+7. Sybase
 
 Getting Started
 ---------------

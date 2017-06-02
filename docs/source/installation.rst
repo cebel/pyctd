@@ -28,13 +28,6 @@ installation - also works. Following RDMSs are supported (by SQLAlchemy):
 6. SQLite
 7. Sybase
 
-Setup of database configuration
--------------------------------
-
-First time you import :code:`pyctd` in the python console it's time to configure our database configurations:
-
-
-
 Install software
 ----------------
 
@@ -48,8 +41,73 @@ Change to folder :code:`cd pyctd`
 
 Install with pip :code:`pip install -e .`
 
+MySQL/MariaDB setup
+~~~~~~~~~~~~~~~~~~~
+Log in MySQL as root user and create a new database, create a user, assign the rights and flush privileges.
+
+.. code-block:: mysql
+
+    CREATE DATABASE pyctd CHARACTER SET utf8 COLLATE utf8_general_ci;
+    GRANT ALL PRIVILEGES ON pyctd.* TO 'pyctd_user'@'%' IDENTIFIED BY 'pyctd_passwd';
+    FLUSH PRIVILEGES;
+
+Start a python shell and set the MySQL configuration. If you have not changed anything in the SQL statements ...
+
+.. code-block:: python
+
+    import pyctd
+    pyctd.set_mysql_connection()
+
+If you have used you own settings, please adapt the following command to you requirements.
+
+.. code-block:: python
+
+    import pyctd
+    pyctd.set_mysql_connection()
+    pyctd.set_mysql_connection(host='localhost', user='pyctd_user', passwd='pyctd_passwd', db='pyctd')
+
+Updating
+~~~~~~~~
+The updating process will download the files provided by the CTD team on the
+`download page <http://ctdbase.org/downloads/>`_
+
+.. warning:: Please note that download files needs 1,5Gb of disk space and the update takes ~2h (depending on your system)
+
+.. code-block:: python
+
+    import pyctd
+    pyctd.update()
+
 
 Changing database configuration
 -------------------------------
 
-Can can always change the configuration of your database system.
+Following functions allow to change the connection to you RDBMS (relational database management system). Next
+time you will use :code:`pyctd` by default this connection will be used.
+
+To set a new MySQL/MariaDB connection ...
+
+.. code-block:: python
+
+    import pyctd
+    pyctd.set_mysql_connection()
+    pyctd.set_mysql_connection(host='localhost', user='pyctd_user', passwd='pyctd_passwd', db='pyctd')
+
+To set connection to other database systems use the `pyctd.set_connection` function.
+
+For more information about connection strings go to
+the `SQLAlchemy documentation <http://docs.sqlalchemy.org/en/latest/core/engines.html>`_.
+
+Examples for valid connection strings are:
+
+- mysql+pymysql://user:passwd@localhost/database?charset=utf8
+- postgresql://scott:tiger@localhost/mydatabase
+- mssql+pyodbc://user:passwd@database
+- oracle://user:passwd@127.0.0.1:1521/database
+- Linux: sqlite:////absolute/path/to/database.db
+- Windows: sqlite:///C:\\path\\to\\database.db
+
+.. code-block:: python
+
+    import pyctd
+    pyctd.set_connection('oracle://user:passwd@127.0.0.1:1521/database')

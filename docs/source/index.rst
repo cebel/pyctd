@@ -69,15 +69,6 @@ a scientific cooperation with us.
    technology
 
 
-
-Objectives
-----------
-
-
-
-
-
-
 Acknowledgment and contribution to scientific projects
 ------------------------------------------------------
 
