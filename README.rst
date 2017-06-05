@@ -7,7 +7,7 @@ PyCTD |stable_build|
 to access and query chemical–gene/protein interactions, chemical–disease and gene–disease
 relationships by data provided by the `Comparative Toxicogenomics Database <http://ctdbase.org>`_ .
 Data are installed in a (local or remte) RDBMS enabling bioinformatic algorithms very fast response times
-to sophisticated queries and high flexibility by using SOLAlchemy database layer.
+to sophisticated queries and high flexibility by using SQLAlchemy database layer.
 PyCTD is developed by the
 `Department of Bioinformatics <https://www.scai.fraunhofer.de/en/business-research-areas/bioinformatics.html>`_
 at the Fraunhofer Institute for Algorithms and Scientific Computing
@@ -24,7 +24,7 @@ This development is supported by following `IMI <https://www.imi.europa.eu/>`_ p
 
 |imi_logo| |aetionomy_logo| |phago_logo| |scai_logo|
 
-Supported databases
+Supported Databases
 -------------------
 
 `PyCTD` uses `SQLAlchemy <http://sqlalchemy.readthedocs.io>`_ to cover a wide spectrum of RDMSs
@@ -80,7 +80,7 @@ changing database system later go to the subtitle *Changing database configurati
 `Changing database configuration <http://pyctd.readthedocs.io/en/latest/installation.html>`_
 in the documentation on readthedocs.
 
-MySQL/MariaDB setup
+MySQL/MariaDB Setup
 ~~~~~~~~~~~~~~~~~~~
 Log in MySQL as root user and create a new database, create a user, assign the rights and flush privileges.
 
@@ -102,7 +102,6 @@ If you have used you own settings, please adapt the following command to you req
 .. code-block:: python
 
     import pyctd
-    pyctd.set_mysql_connection()
     pyctd.set_mysql_connection(host='localhost', user='pyctd_user', passwd='pyctd_passwd', db='pyctd')
 
 Updating
@@ -117,12 +116,12 @@ The updating process will download the files provided by the CTD team on the
     import pyctd
     pyctd.update()
 
-Test a query function
-~~~~~~~~~~~~~~~~~~~~~
+Example Query
+~~~~~~~~~~~~~
 .. code-block:: python
 
     >>> query = pyctd.query()
-    >>> results =query.get_chem_gene_interaction_actions(gene_name='APP', interaction_action='meman%', limit=1)
+    >>> results = query.get_chem_gene_interaction_actions(gene_name='APP', interaction_action='meman%', limit=1)
     >>> first_result = r
     >>> r.chemical
     Memantine
@@ -132,17 +131,17 @@ Test a query function
     [DB014043]
 
 
-More information
+More Information
 ----------------
 See the `installation documentation <http://pyctd.readthedocs.io/en/latest/installation.html>`_ for more advanced
 instructions. Also, check the change log at :code:`CHANGELOG.rst`.
 
-CTD tools and licence (use of data)
+CTD Tools and License (use of data)
 -----------------------------------
 CTD provides also many online `query interfaces <http://ctdbase.org/search/>`_ and
 `tools to analyse data <http://ctdbase.org/tools/>`_ on their website.
 
-Please be aware of the `CTD licence <http://ctdbase.org/about/legal.jsp>`_ which allows the use of data only for
+Please be aware of the `CTD license <http://ctdbase.org/about/legal.jsp>`_ which allows the use of data only for
 research and educational purposes. Medical treatment decisions should not be made based on the information in CTD.
 
 Any reproduction or use for commercial purpose is prohibited without the prior express written permission of the
