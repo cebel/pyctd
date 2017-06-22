@@ -225,7 +225,7 @@ class QueryManager(BaseDbManager):
         if pathway_name:
             q = q.filter(models.Pathway.pathway_name.like(pathway_name))
         if pathway_id:
-            q = q.filter(models.Pathway.pathway_name.like(pathway_id))
+            q = q.filter(models.Pathway.pathway_id.like(pathway_id))
 
         return self._limit_and_df(q, limit, as_df)
 
