@@ -42,14 +42,16 @@ def main():
 
 @main.command()
 @click.option('-c', '--connection', help='SQL Alchemy connection string')
-@click.option('-f', '--force_downloaod', help='force download, overwrites last download')
-def update(connection=None, force_downloaod=False):
-    manager.database.update(connection, force_downloaod)
+@click.option('-f', '--force_download', is_flag=True, help='forces download; overwrites last download')
+def update(connection, force_download):
+    """Update the database"""
+    manager.database.update(connection, force_download)
 
 @main.command(help="Set SQL Alchemy connection string, change default "+
                    "configuration. Without any option, sqlite will be set as default.")
 @click.option('-c', '--connection')
-def setcon(connection=None):
+def setcon(connection):
+    """Set the connection string"""
     manager.database.set_connection(connection)
 
 @main.command(help="Set SQL Alchemy connection string, change default "+
@@ -64,17 +66,13 @@ def setmysql(host,user,passwd,db,charset):
 
 @main.command()
 def getcon():
+    """Get the connection string"""
     click.echo(manager.database.BaseDbManager.get_connection_string())
 
 @main.group(help="PyBEL Data Manager Utilities")
 def manage():
     pass
 
-#@manage.command(help="test help text")
-#@click.option('-l', '--long', count=True, help='blablabla help')
-#def hello(long):
-#    print('hello {}'.format(long))
-
-
+ 
 if __name__ == '__main__':
     main()
