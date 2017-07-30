@@ -113,6 +113,7 @@ class QueryManager(BaseDbManager):
                 query = query.filter(models.Pathway.pathway_id.like(pathway_id))
             if pathway_name:
                 query = query.filter(models.Pathway.pathway_name.like(pathway_name))
+
         return query
 
     def get_disease(self, disease_name=None, disease_id=None, definition=None, parent_ids=None, tree_numbers=None,
@@ -144,22 +145,31 @@ class QueryManager(BaseDbManager):
             normalize parent_ids, tree_numbers and parent_tree_numbers in :class:`pyctd.manager.models.Disease`
         """
         q = self.session.query(models.Disease)
+
         if disease_name:
             q = q.filter(models.Disease.disease_name.like(disease_name))
+
         if disease_id:
             q = q.filter(models.Disease.disease_id == disease_id)
+
         if definition:
             q = q.filter(models.Disease.definition.like(definition))
+
         if parent_ids:
             q = q.filter(models.Disease.parent_ids.like(parent_ids))
+
         if tree_numbers:
             q = q.filter(models.Disease.tree_numbers.like(tree_numbers))
+
         if parent_tree_numbers:
             q = q.filter(models.Disease.parent_tree_numbers.like(parent_tree_numbers))
+
         if slim_mapping:
             q = q.join(models.DiseaseSlimmapping).filter(models.DiseaseSlimmapping.slim_mapping.like(slim_mapping))
+
         if synonym:
             q = q.join(models.DiseaseSynonym).filter(models.DiseaseSynonym.synonym.like(synonym))
+
         if alt_disease_id:
             q = q.join(models.DiseaseAltdiseaseid).filter(models.DiseaseAltdiseaseid.alt_disease_id == alt_disease_id)
 
@@ -186,20 +196,28 @@ class QueryManager(BaseDbManager):
             :class:`pyctd.manager.models.Gene`
         """
         q = self.session.query(models.Gene)
+
         if gene_symbol:
             q = q.filter(models.Gene.gene_symbol.like(gene_symbol))
+
         if gene_name:
             q = q.filter(models.Gene.gene_name.like(gene_name))
+
         if gene_id:
             q = q.filter(models.Gene.gene_id.like(gene_id))
+
         if synonym:
             q = q.join(models.GeneSynonym).filter(models.GeneSynonym.synonym == synonym)
+
         if uniprot_id:
             q = q.join(models.GeneUniprot).filter(models.GeneUniprot.uniprot_id == uniprot_id)
+
         if pharmgkb_id:
             q = q.join(models.GenePharmgkb).filter(models.GenePharmgkb.pharmgkb_id == pharmgkb_id)
+
         if biogrid_id:
             q = q.join(models.GeneBiogrid).filter(models.GeneBiogrid.biogrid_id == biogrid_id)
+
         if alt_gene_id:
             q = q.join(models.GeneAltGeneId.alt_gene_id == alt_gene_id)
 
@@ -222,8 +240,10 @@ class QueryManager(BaseDbManager):
             :class:`pyctd.manager.models.Pathway`
         """
         q = self.session.query(models.Pathway)
+
         if pathway_name:
             q = q.filter(models.Pathway.pathway_name.like(pathway_name))
+
         if pathway_id:
             q = q.filter(models.Pathway.pathway_id.like(pathway_id))
 
@@ -251,22 +271,30 @@ class QueryManager(BaseDbManager):
             :class:`pyctd.manager.models.Chemical`
         """
         q = self.session.query(models.Chemical)
+
         if chemical_name:
             q = q.filter(models.Chemical.chemical_name.like(chemical_name))
+
         if chemical_id:
             q = q.filter(models.Chemical.chemical_id == chemical_id)
+
         if cas_rn:
             q = q.filter(models.Chemical.cas_rn == cas_rn)
+
         if drugbank_id:
             q = q.join(models.ChemicalDrugbank).filter(models.ChemicalDrugbank.drugbank_id == drugbank_id)
+
         if parent_id:
             q = q.join(models.ChemicalParentid).filter(models.ChemicalParentid.parent_id == parent_id)
+
         if tree_number:
             q = q.join(models.ChemicalTreenumber) \
                 .filter(models.ChemicalTreenumber.tree_number == tree_number)
+
         if parent_tree_number:
             q = q.join(models.ChemicalParenttreenumber) \
                 .filter(models.ChemicalParenttreenumber.parent_tree_number == parent_tree_number)
+
         if synonym:
             q = q.join(models.ChemicalSynonym).filter(models.ChemicalSynonym.synonym.like(synonym))
 
@@ -342,7 +370,7 @@ class QueryManager(BaseDbManager):
     def gene_forms(self):
         """
         :return: List of strings for all available gene forms
-        :rtype: list of :class:`str`
+        :rtype: list[str]
         """
         q = self.session.query(distinct(models.ChemGeneIxnGeneForm.gene_form))
         return [x[0] for x in q.all()]
@@ -351,32 +379,32 @@ class QueryManager(BaseDbManager):
     def interaction_actions(self):
         """
         :return: List of strings for allowed interaction/actions combinations
-        :rtype: list
+        :rtype: list[str]
         """
         r = self.session.query(distinct(models.ChemGeneIxnInteractionAction.interaction_action)).all()
         return [x[0] for x in r]
 
     @property
     def actions(self):
-        """
-        :return: List of strings for allowed actions
-        :rtype: list
+        """Gets the list of allowed actions
+
+        :rtype: list[str]
         """
         r = self.session.query(models.Action).all()
         return [x.type_name for x in r]
 
     @property
     def pathways(self):
-        """
-        :return: List of strings for pathways
+        """Get all pathways
+
+        :rtype: list[models.Pathway]
         """
         return self.session.query(models.Pathway).all()
 
     def get_gene_disease(self, direct_evidence=None, inference_chemical_name=None, inference_score=None,
                          gene_name=None, gene_symbol=None, gene_id=None, disease_name=None, disease_id=None,
                          disease_definition=None, limit=None, as_df=False):
-        """
-        Get gene–disease associations 
+        """Get gene–disease associations
 
         :param bool as_df: if set to True result returns as `pandas.DataFrame`
         :param int gene_id: gene identifier
@@ -401,10 +429,13 @@ class QueryManager(BaseDbManager):
             :class:`pyctd.manager.models.Gene`
         """
         q = self.session.query(models.GeneDisease)
+
         if direct_evidence:
             q = q.filter(models.GeneDisease.direct_evidence == direct_evidence)
+
         if inference_chemical_name:
             q = q.filter(models.GeneDisease.inference_chemical_name == inference_chemical_name)
+
         if inference_score:
             q = q.filter(models.GeneDisease.inference_score == inference_score)
 
@@ -422,6 +453,7 @@ class QueryManager(BaseDbManager):
         :rtype: list
         """
         q = self.session.query(distinct(models.GeneDisease.direct_evidence))
+
         return q.all()
 
     def get_disease_pathways(self, disease_id=None, disease_name=None, pathway_id=None, pathway_name=None,
@@ -484,10 +516,13 @@ class QueryManager(BaseDbManager):
             :class:`pyctd.manager.models.Chemical`
         """
         q = self.session.query(models.ChemicalDisease)
+
         if direct_evidence:
             q = q.filter(models.ChemicalDisease.direct_evidence.like(direct_evidence))
+
         if inference_gene_symbol:
             q = q.filter(models.ChemicalDisease.inference_gene_symbol.like(inference_gene_symbol))
+
         if inference_score:
             if inference_score_operator == ">":
                 q = q.filter_by(models.ChemicalDisease.inference_score > inference_score)
@@ -542,6 +577,7 @@ class QueryManager(BaseDbManager):
             .join(models.Chemical) \
             .filter(models.Chemical.chemical_name == chemical_name) \
             .order_by(models.ChemGoEnriched.highest_go_level.desc(), models.ChemGoEnriched.corrected_p_value)
+
         return self._limit_and_df(q, limit, as_df)
 
     # TODO documentation of get_pathway_enriched__by__chemical_name
@@ -557,6 +593,7 @@ class QueryManager(BaseDbManager):
             .join(models.Chemical) \
             .filter(models.Chemical.chemical_name == chemical_name) \
             .order_by(models.ChemPathwayEnriched.corrected_p_value)
+
         return self._limit_and_df(q, limit, as_df)
 
     def get_therapeutic_chemical__by__disease_name(self, disease_name, limit=None, as_df=False):
@@ -573,6 +610,7 @@ class QueryManager(BaseDbManager):
             .join(models.Disease) \
             .filter(models.Disease.disease_name == disease_name,
                     models.ChemicalDisease.direct_evidence == 'therapeutic')
+
         return self._limit_and_df(q, limit, as_df)
 
     # TODO documentation of get_marker_chemical__by__disease_name
@@ -588,6 +626,7 @@ class QueryManager(BaseDbManager):
             .join(models.Disease) \
             .filter(models.Disease.disease_name == disease_name,
                     models.ChemicalDisease.direct_evidence == 'marker/mechanism')
+
         return self._limit_and_df(q, limit, as_df)
 
     # TODO documentation of get_chemical__by__disease
@@ -603,6 +642,7 @@ class QueryManager(BaseDbManager):
             .join(models.Disease) \
             .filter(models.Disease.disease_name == disease_name) \
             .order_by(models.ChemicalDisease.inference_score.desc())
+
         return self._limit_and_df(q, limit, as_df)
 
     # TODO documentation of get_action
@@ -614,6 +654,7 @@ class QueryManager(BaseDbManager):
         :return:
         """
         q = self.session.query(models.Action)
+
         return self._limit_and_df(q, limit, as_df)
 
     # TODO documentation of get_exposure_event
