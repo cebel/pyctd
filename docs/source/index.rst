@@ -40,7 +40,6 @@ PyCTD is an ongoing project and needs further development as well as improvement
    :target: pageapplet/index.html
 
 .. toctree::
-   :numbered:
    :maxdepth: 2
 
    installation
@@ -55,7 +54,6 @@ PyCTD is an ongoing project and needs further development as well as improvement
    manager
 
 .. toctree::
-   :numbered:
    :caption: Project
    :name: project
 
