@@ -1,7 +1,11 @@
 # -*- coding: utf-8 -*-
-from collections import OrderedDict
+
 import re
+from collections import OrderedDict
+
 from . import models
+
+id_re = re.compile("((IDs)|(ID)|([A-Z][a-z]+)|([A-Z]{2,}))")
 
 
 def standard_db_name(file_column_name):
@@ -11,13 +15,16 @@ def standard_db_name(file_column_name):
     This method is only used if values in table[model]['columns'] are str
 
     :param str file_column_name: name of column in file
-    :return str: standard name
+    :return: standard name
+    :rtype: str
     """
-    standard_name = file_column_name
-    found = re.findall("((IDs)|(ID)|([A-Z][a-z]+)|([A-Z]{2,}))", file_column_name)
-    if len(found):
-        standard_name = '_'.join([x[0].lower() for x in found])
-    return standard_name
+    found = id_re.findall(file_column_name)
+
+    if not found:
+        return file_column_name
+
+    return '_'.join(x[0].lower() for x in found)
+
 
 models_to_map = (models.Chemical, models.Pathway, models.Gene, models.Disease)
 
@@ -89,7 +96,7 @@ tables = OrderedDict([
     (models.ExposureEvent, {
         "file_name": 'CTD_exposure_events.tsv.gz',
         "columns": [
-            #('exposurestressorname', 'chemical_name'),
+            # ('exposurestressorname', 'chemical_name'),
             ('exposurestressorid', 'chemical_id'),
             ('stressorsourcecategory', 'stressor_source_category'),
             ('stressorsourcedetails', 'stressor_source_details'),
@@ -120,7 +127,7 @@ tables = OrderedDict([
             ('citytownregionarea', 'city_town_region_area'),
             ('exposureeventnotes', 'exposure_event_notes'),
             ('outcomerelationship', 'outcome_relationship'),
-            #('diseasename', 'disease_name'),
+            # ('diseasename', 'disease_name'),
             ('diseaseid', 'disease_id'),
             ('phenotypename', 'phenotype_name'),
             ('phenotypeid', 'phenotype_id'),
@@ -134,7 +141,6 @@ tables = OrderedDict([
             ('studyfactors', 'study_factors')
         ]
     }),
-
 
     (models.DiseasePathway, {
         "file_name": 'CTD_diseases_pathways.tsv.gz',
@@ -242,12 +248,13 @@ tables = OrderedDict([
 ])
 
 for model in tables:
-    cols = tables[model]['columns']
-    for i in range(len(cols)):
-        if isinstance(cols[i], str):
-            cols[i] = (cols[i], standard_db_name(cols[i]))
+
+    tables[model]['columns'] = [
+        (column, standard_db_name(column)) if isinstance(column, str) else column
+        for column in tables[model]['columns']
+    ]
+
     if 'domain_id_column' in tables[model]:
         d_id_col = tables[model]['domain_id_column']
         if isinstance(d_id_col, str):
             tables[model]['domain_id_column'] = (d_id_col, standard_db_name(d_id_col))
-
