@@ -21,8 +21,9 @@ import time
 
 import click
 
-from .constants import PYCTD_DIR
 from . import manager
+from .constants import PYCTD_DIR
+from .manager.database import get_connection_string
 
 log = logging.getLogger('pyctd')
 
@@ -35,44 +36,44 @@ fh.setLevel(logging.DEBUG)
 fh.setFormatter(formatter)
 log.addHandler(fh)
 
+
 @click.group(help="PyCTD Command Line Utilities on {}".format(sys.executable))
 @click.version_option()
 def main():
     pass
 
+
 @main.command()
-@click.option('-c', '--connection', help='SQL Alchemy connection string')
+@click.option('-c', '--connection', help='Connection string. Defaults to {}'.format(get_connection_string()))
 @click.option('-f', '--force_download', is_flag=True, help='forces download; overwrites last download')
 def update(connection, force_download):
     """Update the database"""
     manager.database.update(connection, force_download)
 
-@main.command(help="Set SQL Alchemy connection string, change default "+
-                   "configuration. Without any option, sqlite will be set as default.")
-@click.option('-c', '--connection')
-def setcon(connection):
-    """Set the connection string"""
+
+@main.command()
+@click.argument('connection')
+def set_connnection(connection):
+    """Set the SQLAlchemy connection string"""
     manager.database.set_connection(connection)
 
-@main.command(help="Set SQL Alchemy connection string, change default "+
-                   "configuration. Without any option, sqlite will be set as default.")
+
+@main.command()
 @click.option('-h', '--host', default='localhost')
 @click.option('-u', '--user', default='pyctd_user')
-@click.option('-p', '--passwd', default='pyctd_passwd')
+@click.option('-p', '--password', default='pyctd_passwd')
 @click.option('-d', '--db', default='pyctd')
 @click.option('-c', '--charset', default='utf8')
-def setmysql(host,user,passwd,db,charset):
-    manager.database.set_mysql_connection(host, user, passwd,db, charset)
+def set_mysql(host, user, password, db, charset):
+    """Set the SQLAlchemy connection string with MySQL settings"""
+    manager.database.set_mysql_connection(host, user, password, db, charset)
+
 
 @main.command()
 def getcon():
     """Get the connection string"""
-    click.echo(manager.database.BaseDbManager.get_connection_string())
+    click.echo(get_connection_string())
 
-@main.group(help="PyBEL Data Manager Utilities")
-def manage():
-    pass
 
- 
 if __name__ == '__main__':
     main()

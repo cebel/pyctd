@@ -42,6 +42,29 @@ alchemy_pandas_dytpe_mapper = {
 }
 
 
+def get_connection_string(connection=None):
+    """return sqlalchemy connection string if it is set
+
+    :param connection: get the SQLAlchemy connection string #TODO
+    :return:
+    """
+    if not connection:
+        config = configparser.ConfigParser()
+        cfp = defaults.config_file_path
+        if os.path.exists(cfp):
+            log.info('fetch database configuration from {}'.format(cfp))
+            config.read(cfp)
+            connection = config['database']['sqlalchemy_connection_string']
+            log.info('load connection string from {}: {}'.format(cfp, connection))
+        else:
+            with open(cfp, 'w') as config_file:
+                connection = defaults.sqlalchemy_connection_string_default
+                config['database'] = {'sqlalchemy_connection_string': connection}
+                config.write(config_file)
+                log.info('create configuration file {}'.format(cfp))
+    return connection
+
+
 class BaseDbManager(object):
     """Creates a connection to database and a persistient session using SQLAlchemy"""
 
@@ -60,7 +83,7 @@ class BaseDbManager(object):
         log.addHandler(handler)
 
         try:
-            self.connection = self.get_connection_string(connection)
+            self.connection = get_connection_string(connection)
             self.engine = create_engine(self.connection, echo=echo)
             self.inspector = reflection.Inspector.from_engine(self.engine)
             self.sessionmaker = sessionmaker(bind=self.engine, autoflush=False, expire_on_commit=False)
@@ -97,28 +120,6 @@ class BaseDbManager(object):
             user_connection = defaults.sqlalchemy_connection_string_default
         set_connection(user_connection.strip())
 
-    @staticmethod
-    def get_connection_string(connection=None):
-        """return sqlalchemy connection string if it is set
-        
-        :param connection: get the SQLAlchemy connection string #TODO
-        :return: 
-        """
-        if not connection:
-            config = configparser.ConfigParser()
-            cfp = defaults.config_file_path
-            if os.path.exists(cfp):
-                log.info('fetch database configuration from {}'.format(cfp))
-                config.read(cfp)
-                connection = config['database']['sqlalchemy_connection_string']
-                log.info('load connection string from {}: {}'.format(cfp, connection))
-            else:
-                with open(cfp, 'w') as config_file:
-                    connection = defaults.sqlalchemy_connection_string_default
-                    config['database'] = {'sqlalchemy_connection_string': connection}
-                    config.write(config_file)
-                    log.info('create configuration file {}'.format(cfp))
-        return connection
 
     def _create_tables(self, checkfirst=True):
         """creates all tables from models in your database

@@ -432,7 +432,8 @@ class QueryManager(BaseDbManager):
         :param disease_id: 
         :param disease_name: 
         :param pathway_id: 
-        :param pathway_name: 
+        :param pathway_name:
+        :param disease_definition:
         :param int limit: maximum number of results
         :return: list of :class:`pyctd.manager.database.models.DiseasePathway` objects
 
@@ -459,19 +460,21 @@ class QueryManager(BaseDbManager):
                               disease_id=None, disease_name=None, limit=None, as_df=False):
         """Get chemical–disease associations with inference gene
         
-        :param bool as_df: if set to True result returns as `pandas.DataFrame`
-        :param chemical_id: 
-        :param disease_id: 
-        :param disease_definition: 
         :param direct_evidence: direct evidence
         :param inference_gene_symbol: inference gene symbol
-        :param inference_score: inference score 
+        :param inference_score: inference score
         :param inference_score_operator: inference score operator
-        :param disease_name: disease name 
-        :param chemical_name: chemical name 
+        :param cas_rn:
+        :param chemical_name: chemical name
+        :param chemical_id:
+        :param chemical_definition:
+        :param disease_definition:
+        :param disease_id:
+        :param disease_name: disease name
         :param int limit: maximum number of results
+        :param bool as_df: if set to True result returns as `pandas.DataFrame`
         :return: list of :class:`pyctd.manager.database.models.ChemicalDisease` objects
-        
+
         .. seealso::
             
             :class:`pyctd.manager.models.ChemicalDisease`
@@ -526,14 +529,30 @@ class QueryManager(BaseDbManager):
 
         return self._limit_and_df(q, limit, as_df)
 
+    # TODO documentation of get_go_enriched__by__chemical_name
     def get_go_enriched__by__chemical_name(self, chemical_name, limit=None, as_df=False):
+        """
+
+        :param chemical_name:
+        :param limit:
+        :param as_df:
+        :return:
+        """
         q = self.session.query(models.ChemGoEnriched) \
             .join(models.Chemical) \
             .filter(models.Chemical.chemical_name == chemical_name) \
             .order_by(models.ChemGoEnriched.highest_go_level.desc(), models.ChemGoEnriched.corrected_p_value)
         return self._limit_and_df(q, limit, as_df)
 
+    # TODO documentation of get_pathway_enriched__by__chemical_name
     def get_pathway_enriched__by__chemical_name(self, chemical_name, limit=None, as_df=False):
+        """
+
+        :param chemical_name:
+        :param limit:
+        :param as_df:
+        :return:
+        """
         q = self.session.query(models.ChemPathwayEnriched) \
             .join(models.Chemical) \
             .filter(models.Chemical.chemical_name == chemical_name) \
@@ -548,7 +567,7 @@ class QueryManager(BaseDbManager):
         :param int limit: maximum number of results
         :param str disease_name: disease name
         :return: therapeutic chemical
-        :rtpye: list[models.ChemicalDisease]
+        :rtype: list[models.ChemicalDisease]
         """
         q = self.session.query(models.ChemicalDisease) \
             .join(models.Disease) \
@@ -556,23 +575,47 @@ class QueryManager(BaseDbManager):
                     models.ChemicalDisease.direct_evidence == 'therapeutic')
         return self._limit_and_df(q, limit, as_df)
 
+    # TODO documentation of get_marker_chemical__by__disease_name
     def get_marker_chemical__by__disease_name(self, disease_name, limit=None, as_df=False):
+        """
+
+        :param disease_name:
+        :param limit:
+        :param as_df:
+        :return:
+        """
         q = self.session.query(models.ChemicalDisease) \
             .join(models.Disease) \
             .filter(models.Disease.disease_name == disease_name,
                     models.ChemicalDisease.direct_evidence == 'marker/mechanism')
         return self._limit_and_df(q, limit, as_df)
 
+    # TODO documentation of get_chemical__by__disease
     def get_chemical__by__disease(self, disease_name, limit=None, as_df=False):
+        """
+
+        :param disease_name:
+        :param limit:
+        :param as_df:
+        :return:
+        """
         q = self.session.query(models.ChemicalDisease) \
             .join(models.Disease) \
             .filter(models.Disease.disease_name == disease_name) \
             .order_by(models.ChemicalDisease.inference_score.desc())
         return self._limit_and_df(q, limit, as_df)
 
+    # TODO documentation of get_action
     def get_action(self, limit=None, as_df=False):
+        """
+
+        :param limit:
+        :param as_df:
+        :return:
+        """
         q = self.session.query(models.Action)
         return self._limit_and_df(q, limit, as_df)
 
+    # TODO documentation of get_exposure_event
     def get_exposure_event(self):
-        pass
+        raise NotImplemented
