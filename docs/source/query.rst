@@ -5,12 +5,11 @@ Query
 
 Examples
 --------
-
 For most of the string parameters you can use % as wildcard (please check the documentation below). All methods
-have a parameter `limit` which allows to limit the number of results.
+have a parameter ``limit`` which allows to limit the number of results.
 
-Methods:
-
+Methods
+~~~~~~~
 .. code-block:: python
     :linenos:
 
@@ -23,20 +22,19 @@ Methods:
     q.get_chem_gene_interaction_action(organism_id='9606', gene_symbol='APP')
     q.get_gene__diseases(limit=10)
 
-Properties:
-
+Properties
+~~~~~~~~~~
 .. code-block:: python
     :linenos:
 
-    import pyctd
-    q = pyctd.query
-    q.gene_forms
-    q.interaction_actions
-    q.actions
-    q.pathways
+    >>> import pyctd
+    >>> q = pyctd.query
+    >>> q.gene_forms
+    >>> q.interaction_actions
+    >>> q.actions
+    >>> q.pathways
 
 Query Manager Reference
 -----------------------
-
 .. autoclass:: pyctd.manager.query.QueryManager
     :members:

@@ -12,13 +12,14 @@ Tests were performed on *Ubuntu 16.04, 4 x Intel Core i7-6560U CPU @ 2.20Ghz* wi
 
 .. _rdbms:
 
-Supported databases
+Supported Databases
 -------------------
 
 `PyCTD` uses `SQLAlchemy <http://sqlalchemy.readthedocs.io>`_ to cover a wide spectrum of RDMSs
-(Relational database management system). For best performance MySQL or MariaDB is recommended. But if you have no
-possibility to install software on your system SQLite - which needs no further
-installation - also works. Following RDMSs are supported (by SQLAlchemy):
+(relational database management system). We reccomend MySQL or MariaDB for best performance. If you cannot install
+software on your system, SQLite - which needs no further installation - also works.
+
+The following RDMSs are supported by SQLAlchemy:
 
 1. Firebird
 2. Microsoft SQL Server
@@ -28,18 +29,38 @@ installation - also works. Following RDMSs are supported (by SQLAlchemy):
 6. SQLite
 7. Sybase
 
-Install software
+Install Software
 ----------------
 
 :code:`pyctd` provides a simple API so bioinformaticians and scientists with limited programming knowledge can easily
 use it to interface with CTD between chemical–gene/protein interactions, chemical–disease and gene–disease
 relationships.
 
-Donload with :code:`git clone https://github.com/cebel/pyctd.git`
+Easiest
+~~~~~~~
+Download the latest stable code from `PyPI <https://pypi.python.org/pypi/pyctd>`_ with:
 
-Change to folder :code:`cd pyctd`
+.. code-block:: sh
 
-Install with pip :code:`pip install -e .`
+   $ python3 -m pip install pyctd
+
+Get the Latest
+~~~~~~~~~~~~~~~
+Download the most recent code from `GitHub <https://github.com/cebel/pyctd>`_ with:
+
+.. code-block:: sh
+
+   $ python3 -m pip install git+https://github.com/pyctd/pyctd.git
+
+For Developers
+~~~~~~~~~~~~~~
+Clone the repository from `GitHub <https://github.com/cebel/pyctd>`_ and install in editable mode with:
+
+.. code-block:: sh
+
+   $ git clone https://github.com/pyctd/pyctd.git
+   $ cd pyctd
+   $ python3 -m pip install -e .
 
 MySQL/MariaDB setup
 ~~~~~~~~~~~~~~~~~~~
@@ -55,33 +76,32 @@ Start a python shell and set the MySQL configuration. If you have not changed an
 
 .. code-block:: python
 
-    import pyctd
-    pyctd.set_mysql_connection()
+    >>> import pyctd
+    >>> pyctd.set_mysql_connection()
 
 If you have used you own settings, please adapt the following command to you requirements.
 
 .. code-block:: python
 
-    import pyctd
-    pyctd.set_mysql_connection()
-    pyctd.set_mysql_connection(host='localhost', user='pyctd_user', passwd='pyctd_passwd', db='pyctd')
+    >>> import pyctd
+    >>> pyctd.set_mysql_connection()
+    >>> pyctd.set_mysql_connection(host='localhost', user='pyctd_user', passwd='pyctd_passwd', db='pyctd')
 
 Updating
 ~~~~~~~~
-The updating process will download the files provided by the CTD team on the
+The updating process will download the files provided by the CTD on the
 `download page <http://ctdbase.org/downloads/>`_
 
-.. warning:: Please note that download files needs 1,5Gb of disk space and the update takes ~2h (depending on your system)
+.. warning:: Please note the download needs 1.5 GB and the update takes ~2 hours (depending on your system)
 
 .. code-block:: python
 
-    import pyctd
-    pyctd.update()
+    >>> import pyctd
+    >>> pyctd.update()
 
 
 Changing database configuration
 -------------------------------
-
 Following functions allow to change the connection to you RDBMS (relational database management system). Next
 time you will use :code:`pyctd` by default this connection will be used.
 
@@ -91,7 +111,7 @@ To set a new MySQL/MariaDB connection ...
 
     import pyctd
     pyctd.set_mysql_connection()
-    pyctd.set_mysql_connection(host='localhost', user='pyctd_user', passwd='pyctd_passwd', db='pyctd')
+    pyctd.set_mysql_connection(host='localhost', user='pyctd_user', password='pyctd_passwd', db='pyctd')
 
 To set connection to other database systems use the `pyctd.set_connection` function.
 

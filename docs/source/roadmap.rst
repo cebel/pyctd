@@ -6,7 +6,7 @@ Next steps:
 - Functions to identify potential drugs in `BEL <http://openbel.org/>`_ disease pathways
 - mapping of interaction_action CTD and `BEL relationships <http://openbel.org/language/version_2.0/bel_specification_version_2.0.html#_bel_relationships>`_
 - flask restful API
-- Implment more query functions
+- Implement more query functions
 - Export of query results to different formats
 - Test for all supported :ref:`rdbms`
 - Improve documentation and tutorials

@@ -18,7 +18,7 @@ Just add `--user` behind `install`.
 
 .. code-block:: python
 
-    python3 -m pip install pyctd
+    >>> python3 -m pip install pyctd
 
 Make sure that you have access to a database with user name and correct permissions. Otherwise execute on the MariaDB
 or MySQL console the flowing command as root. Replace user name, password and servername (here `localhost`) to
@@ -38,14 +38,14 @@ Start your python console:
 
 .. code-block:: bash
 
-    python3
+    $ python3
 
 Import the data:
 
 .. code-block:: python
 
-    import pyctd
-    sqlalchemy_connection_string = 'mysql+pymysql://db_user:db_pwd@server_name/db_name?charset=utf8'
-    pyctd.update(sqlalchemy_connection_string)
+    >>> import pyctd
+    >>> sqlalchemy_connection_string = 'mysql+pymysql://db_user:db_pwd@server_name/db_name?charset=utf8'
+    >>> pyctd.update(sqlalchemy_connection_string)
 
 For examples how to query the database go to :class:`pyctd.manager.database.Query` or `Tutorial`

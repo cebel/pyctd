@@ -45,7 +45,6 @@ PyCTD is an ongoing project and needs further development as well as improvement
 
    installation
    quick_start
-   tutorial
    ctd
    benchmarks
 

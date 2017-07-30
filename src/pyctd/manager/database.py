@@ -125,32 +125,30 @@ class BaseDbManager(object):
         
         :param bool checkfirst: Check if tables already exists
         """
-        log.info('create tables in %s', self.engine.url)
+        log.info('creating tables in %s', self.engine.url)
         models.Base.metadata.create_all(self.engine, checkfirst=checkfirst)
 
     def drop_all(self):
         """Drops all tables in the database"""
-        log.info('drop tables in %s', self.engine.url)
+        log.info('dropping tables in %s', self.engine.url)
         self.session.commit()
         models.Base.metadata.drop_all(self.engine)
         self.session.commit()
 
 
 class DbManager(BaseDbManager):
-    """Manages the database import"""
+    """Implements functions to upload CTD files into a database. Preferred SQL Alchemy database is MySQL with
+    :mod:`pymysql`.
+    """
 
     __mapper = {}
 
     pyctd_data_dir = PYCTD_DATA_DIR
 
     def __init__(self, connection=None):
-        """The DbManager implements all function to upload CTD files into the database. Prefered SQL Alchemy 
-        database is MySQL with pymysql.
-        
-        :param connection: custom database connection SQL Alchemy string
-        :type connection: str
         """
-
+        :param str connection: custom database connection SQL Alchemy string
+        """
         super(DbManager, self).__init__(connection=connection)
         self.tables = get_table_configurations()
 
@@ -162,7 +160,7 @@ class DbManager(BaseDbManager):
         3. creates all tables in database
         4. import all data from CTD files
         
-        :param iter[str] urls: iterable of URL strings
+        :param iter[str] urls: An iterable of URL strings
         :param bool force_download: force method to download
         :return: SQL Alchemy model instance, populated with data from URL
         :rtype: :class:`models.Namespace`
