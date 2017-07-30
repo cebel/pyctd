@@ -46,7 +46,6 @@ PyCTD is an ongoing project and needs further development as well as improvement
    installation
    quick_start
    ctd
-   benchmarks
 
 .. toctree::
    :caption: Reference
@@ -60,6 +59,7 @@ PyCTD is an ongoing project and needs further development as well as improvement
    :caption: Project
    :name: project
 
+   benchmarks
    roadmap
    technology
 
@@ -77,8 +77,7 @@ The software development of PyCTD at Fraunhofer Institute for Algorithms and Sci
 and funded by the `IMI <https://www.imi.europa.eu/>`_
 (INNOVATIVE MEDICINES INITIATIVE) projects `AETIONOMY <http://www.aetionomy.eu/>`_  and
 `PHAGO <https://www.imi.europa.eu/content/phago>`_. The aim of both projects is the identification of mechanisms in
-Alzhiemer's and Parkinson's disease for drug development through creation and analysis of complex biological `BEL <http://openbel.org/>`_ networks.
-
+Alzheimer's and Parkinson's disease for drug development through creation and analysis of complex biological `BEL <http://openbel.org/>`_ networks.
 
 
 Indices and Tables

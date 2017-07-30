@@ -62,6 +62,9 @@ Clone the repository from `GitHub <https://github.com/cebel/pyctd>`_ and install
    $ cd pyctd
    $ python3 -m pip install -e .
 
+Database Setup
+--------------
+
 MySQL/MariaDB setup
 ~~~~~~~~~~~~~~~~~~~
 Log in MySQL as root user and create a new database, create a user, assign the rights and flush privileges.
@@ -100,8 +103,8 @@ The updating process will download the files provided by the CTD on the
     >>> pyctd.update()
 
 
-Changing database configuration
--------------------------------
+Database Configuration
+----------------------
 Following functions allow to change the connection to you RDBMS (relational database management system). Next
 time you will use :code:`pyctd` by default this connection will be used.
 

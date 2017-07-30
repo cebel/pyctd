@@ -1,11 +1,8 @@
 Data Manager Reference
 ======================
 
-.. contents::
-
-DbManager Manager
------------------
-
+Database Manager
+----------------
 .. autoclass:: pyctd.manager.database.DbManager
     :members:
 
