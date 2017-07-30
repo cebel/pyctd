@@ -91,6 +91,7 @@ class BaseDbManager(object):
             self.__init__()
 
     def set_connection_string_by_user_input(self):
+        """Prompts the user to input a connection string"""
         user_connection = input(
             bcolors.WARNING + "\nFor any reason connection to " + bcolors.ENDC +
             bcolors.FAIL + "{}".format(self.connection) + bcolors.ENDC +
@@ -140,7 +141,10 @@ class BaseDbManager(object):
 
 
 class DbManager(BaseDbManager):
+    """Manages the database import"""
+
     __mapper = {}
+
     pyctd_data_dir = PYCTD_DATA_DIR
 
     def __init__(self, connection=None):
@@ -154,7 +158,7 @@ class DbManager(BaseDbManager):
         super(DbManager, self).__init__(connection=connection)
         self.tables = get_table_configurations()
 
-    def db_import(self, urls=None, force_download=False, add_inchis=True):
+    def db_import(self, urls=None, force_download=False):
         """Updates the CTD database
         
         1. downloads all files from CTD
@@ -162,10 +166,8 @@ class DbManager(BaseDbManager):
         3. creates all tables in database
         4. import all data from CTD filess
         
-        :param urls: iterable of URL strings
-        :type urls: str
-        :param force_download: force method to download
-        :type: bool
+        :param iter[str] urls: iterable of URL strings
+        :param bool bool force_download: force method to download
         :return: SQL Alchemy model instance, populated with data from URL
         :rtype: :class:`models.Namespace`
         """
@@ -234,7 +236,8 @@ class DbManager(BaseDbManager):
                 continue
             self.import_table(table)
 
-    def get_index_of_column(self, column, file_path):
+    @staticmethod
+    def get_index_of_column(column, file_path):
         """Get index of a specific column name in a CTD file
         
         :param column: 
@@ -245,7 +248,8 @@ class DbManager(BaseDbManager):
         if column in columns:
             return columns.index(column)
 
-    def get_index_and_columns_order(self, columns_in_file_expected, columns_dict, file_path):
+    @staticmethod
+    def get_index_and_columns_order(columns_in_file_expected, columns_dict, file_path):
         """
         
         :param columns_in_file_expected: 
@@ -258,11 +262,11 @@ class DbManager(BaseDbManager):
 
         column_names_from_file = DbManager.get_column_names_from_file(file_path)
         if not set(columns_in_file_expected).issubset(column_names_from_file):
-            log.exception('{} columns are not a subset of columns {} in file {}'.format(
+            log.exception(
+                '%s columns are not a subset of columns %s in file %s',
                 columns_in_file_expected,
                 column_names_from_file,
                 file_path
-            )
             )
         else:
             for index, column in enumerate(column_names_from_file):
@@ -299,7 +303,7 @@ class DbManager(BaseDbManager):
         
         :param file_path: 
         :param column_index: 
-        :param parent_table_name: 
+        :param parent_table:
         :param column_in_one2many_table: 
         :return: 
         """
@@ -336,7 +340,14 @@ class DbManager(BaseDbManager):
                 column_in_one2many_table: child_values
             }).to_sql(name=o2m_table_name, if_exists='append', con=self.engine, index=False)
 
-    def get_dtypes(self, sqlalchemy_model):
+    # TODO document get_dtypes
+    @staticmethod
+    def get_dtypes(sqlalchemy_model):
+        """
+
+        :param sqlalchemy_model:
+        :return:
+        """
         mapper = inspect(sqlalchemy_model)
         dtypes = {x.key: alchemy_pandas_dytpe_mapper[type(x.type)] for x in mapper.columns if x.key != 'id'}
         return dtypes
@@ -344,13 +355,10 @@ class DbManager(BaseDbManager):
     def import_table_in_db(self, file_path, use_columns_with_index, column_names_in_db, table):
         """Imports data from CTD file into database
         
-        :param table: `manager.table.Table` object
         :param str file_path: path to file
-        :param use_columns_with_index: list of column indices in file
-        :type use_columns_with_index: list of int
-        :param column_names_in_db: list of column names (have to fit to models except domain_id column name) 
-        :type column_names_in_db: list of str
-        :param dict pandas_dtypes: dictionary of pandas datatypse
+        :param list[int] use_columns_with_index: list of column indices in file
+        :param list[str] column_names_in_db: list of column names (have to fit to models except domain_id column name)
+        :param table: `manager.table.Table` object
         """
         chunks = pd.read_table(
             file_path,
@@ -433,12 +441,9 @@ class DbManager(BaseDbManager):
 def update(connection=None, urls=None, force_download=False):
     """Updates CTD database
 
-    :param urls: list of urls to download
-    :type urls: iterable
-    :param connection: custom database connection string
-    :type connection: str
-    :param force_download: force method to download
-    :type force_download: bool
+    :param iter[str] urls: list of urls to download
+    :param str connection: custom database connection string
+    :param bool force_download: force method to download
     """
 
     db = DbManager(connection)
@@ -447,17 +452,24 @@ def update(connection=None, urls=None, force_download=False):
 
 
 def set_mysql_connection(host='localhost', user='pyctd_user', passwd='pyctd_passwd', db='pyctd', charset='utf8'):
-    set_connection('mysql+pymysql://{user}:{passwd}@{host}/{db}?charset={charset}'
-                   .format(host=host, user=user, passwd=passwd, db=db, charset=charset))
+    """Sets the connection using MySQL Parameters"""
+    set_connection('mysql+pymysql://{user}:{passwd}@{host}/{db}?charset={charset}'.format(
+        host=host,
+        user=user,
+        passwd=passwd,
+        db=db,
+        charset=charset)
+    )
 
 
 def set_test_connection():
+    """Sets the connection with the default SQLite test database"""
     set_connection(defaults.DEFAULT_SQLITE_TEST_DATABASE_NAME)
 
 
 def set_connection(connection=defaults.sqlalchemy_connection_string_default):
-    """
-    Set the connection string for sqlalchemy
+    """Set the connection string for sqlalchemy
+
     :param str connection: sqlalchemy connection string
     """
     cfp = defaults.config_file_path
