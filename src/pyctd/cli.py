@@ -25,15 +25,14 @@ from . import manager
 from .constants import PYCTD_DIR
 from .manager.database import get_connection_string
 
-log = logging.getLogger('pyctd')
+logging.basicConfig(level=logging.DEBUG)
 
-formatter = logging.Formatter('%(name)s:%(levelname)s - %(message)s')
-logging.basicConfig(format=formatter)
+log = logging.getLogger('pyctd')
+log.setLevel(logging.INFO)
 
 fh_path = os.path.join(PYCTD_DIR, time.strftime('pyctd_%Y_%m_%d_%H_%M_%S.txt'))
 fh = logging.FileHandler(fh_path)
 fh.setLevel(logging.DEBUG)
-fh.setFormatter(formatter)
 log.addHandler(fh)
 
 
@@ -48,7 +47,10 @@ def main():
 @click.option('-f', '--force_download', is_flag=True, help='forces download; overwrites last download')
 def update(connection, force_download):
     """Update the database"""
-    manager.database.update(connection, force_download)
+    manager.database.update(
+        connection=connection,
+        force_download=force_download
+    )
 
 
 @main.command()
@@ -66,7 +68,13 @@ def set_connnection(connection):
 @click.option('-c', '--charset', default='utf8')
 def set_mysql(host, user, password, db, charset):
     """Set the SQLAlchemy connection string with MySQL settings"""
-    manager.database.set_mysql_connection(host, user, password, db, charset)
+    manager.database.set_mysql_connection(
+        host=host,
+        user=user,
+        password=password,
+        db=db,
+        charset=charset
+    )
 
 
 @main.command()

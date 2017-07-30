@@ -9,6 +9,7 @@ import logging
 import os
 import re
 import sys
+import time
 from configparser import RawConfigParser
 
 import numpy as np
@@ -41,25 +42,26 @@ alchemy_pandas_dytpe_mapper = {
 
 
 def get_connection_string(connection=None):
-    """return sqlalchemy connection string if it is set
+    """return SQLAlchemy connection string if it is set
 
     :param connection: get the SQLAlchemy connection string #TODO
-    :return:
+    :rtype: str
     """
     if not connection:
         config = configparser.ConfigParser()
         cfp = defaults.config_file_path
         if os.path.exists(cfp):
-            log.info('fetch database configuration from {}'.format(cfp))
+            log.info('fetch database configuration from %s', cfp)
             config.read(cfp)
             connection = config['database']['sqlalchemy_connection_string']
-            log.info('load connection string from {}: {}'.format(cfp, connection))
+            log.info('load connection string from %s: %s', cfp, connection)
         else:
             with open(cfp, 'w') as config_file:
                 connection = defaults.sqlalchemy_connection_string_default
                 config['database'] = {'sqlalchemy_connection_string': connection}
                 config.write(config_file)
-                log.info('create configuration file {}'.format(cfp))
+                log.info('create configuration file %s', cfp)
+
     return connection
 
 
@@ -72,7 +74,6 @@ class BaseDbManager(object):
         :param bool echo: True or False for SQL output of SQLAlchemy engine
         """
         log.setLevel(logging.INFO)
-
         handler = logging.FileHandler(os.path.join(PYCTD_DIR, defaults.TABLE_PREFIX + 'database.log'))
         handler.setLevel(logging.INFO)
 
@@ -119,22 +120,17 @@ class BaseDbManager(object):
             user_connection = defaults.sqlalchemy_connection_string_default
         set_connection(user_connection.strip())
 
-    def _create_tables(self, checkfirst=True):
-        """creates all tables from models in your database
+    def create_all(self, checkfirst=True):
+        """Creates all tables from models in the database
         
-        :param checkfirst: True or False check if tables already exists
-        :type checkfirst: bool
-        :return: 
+        :param bool checkfirst: Check if tables already exists
         """
-        log.info('create tables in {}'.format(self.engine.url))
+        log.info('create tables in %s', self.engine.url)
         models.Base.metadata.create_all(self.engine, checkfirst=checkfirst)
 
-    def _drop_tables(self):
-        """drops all tables in the database
-
-        :return: 
-        """
-        log.info('drop tables in {}'.format(self.engine.url))
+    def drop_all(self):
+        """Drops all tables in the database"""
+        log.info('drop tables in %s', self.engine.url)
         self.session.commit()
         models.Base.metadata.drop_all(self.engine)
         self.session.commit()
@@ -164,21 +160,24 @@ class DbManager(BaseDbManager):
         1. downloads all files from CTD
         2. drops all tables in database
         3. creates all tables in database
-        4. import all data from CTD filess
+        4. import all data from CTD files
         
         :param iter[str] urls: iterable of URL strings
-        :param bool bool force_download: force method to download
+        :param bool force_download: force method to download
         :return: SQL Alchemy model instance, populated with data from URL
         :rtype: :class:`models.Namespace`
         """
-        if urls is None:
-            urls = [defaults.url_base + table_conf.tables[model]['file_name'] for model in table_conf.tables]
+        if not urls:
+            urls = [
+                defaults.url_base + table_conf.tables[model]['file_name']
+                for model in table_conf.tables
+            ]
 
-        log.info('Update CTD database from {}'.format(urls))
+        log.info('Update CTD database from %s', urls)
 
-        self._drop_tables()
-        DbManager.download_urls(urls, force_download)
-        self._create_tables()
+        self.drop_all()
+        self.download_urls(urls=urls, force_download=force_download)
+        self.create_all()
         self.import_tables()
         self.session.close()
 
@@ -223,33 +222,34 @@ class DbManager(BaseDbManager):
                 self.__mapper[domain] = df
         return self.__mapper
 
-    def import_tables(self, only_tables=(), exclude_tables=()):
+    def import_tables(self, only_tables=None, exclude_tables=None):
         """Imports all data in database tables
-        
-        :param exclude_tables: iterable of tables to be excluded
-        :param only_tables: iterable of tables to be imported
-        :type only_tables: iterable of str
-        :return: 
+
+        :param set[str] only_tables: names of tables to be imported
+        :param set[str] exclude_tables: names of tables to be excluded
         """
         for table in self.tables:
-            if (only_tables and table.name not in only_tables) or table.name in exclude_tables:
+            if only_tables is not None and table.name not in only_tables:
+                continue
+
+            if exclude_tables is not None and table.name in exclude_tables:
                 continue
             self.import_table(table)
 
-    @staticmethod
-    def get_index_of_column(column, file_path):
+    @classmethod
+    def get_index_of_column(cls, column, file_path):
         """Get index of a specific column name in a CTD file
         
         :param column: 
         :param file_path: 
         :return: int or None
         """
-        columns = DbManager.get_column_names_from_file(file_path)
+        columns = cls.get_column_names_from_file(file_path)
         if column in columns:
             return columns.index(column)
 
-    @staticmethod
-    def get_index_and_columns_order(columns_in_file_expected, columns_dict, file_path):
+    @classmethod
+    def get_index_and_columns_order(cls, columns_in_file_expected, columns_dict, file_path):
         """
         
         :param columns_in_file_expected: 
@@ -260,7 +260,7 @@ class DbManager(BaseDbManager):
         use_columns_with_index = []
         column_names_in_db = []
 
-        column_names_from_file = DbManager.get_column_names_from_file(file_path)
+        column_names_from_file = cls.get_column_names_from_file(file_path)
         if not set(columns_in_file_expected).issubset(column_names_from_file):
             log.exception(
                 '%s columns are not a subset of columns %s in file %s',
@@ -279,17 +279,16 @@ class DbManager(BaseDbManager):
         """import table by Table object
         
         :param `manager.table_conf.Table` table: Table object
-        :return: 
         """
         file_path = os.path.join(self.pyctd_data_dir, table.file_name)
-        log.info('import CTD from file path {} data into table {}'.format(file_path, table.name))
+        log.info('importing %s data into table %s', file_path, table.name)
+        table_import_timer = time.time()
 
-        r = self.get_index_and_columns_order(
+        use_columns_with_index, column_names_in_db = self.get_index_and_columns_order(
             table.columns_in_file_expected,
             table.columns_dict,
             file_path
         )
-        use_columns_with_index, column_names_in_db = r
 
         self.import_table_in_db(file_path, use_columns_with_index, column_names_in_db, table)
 
@@ -297,6 +296,8 @@ class DbManager(BaseDbManager):
             o2m_column_index = self.get_index_of_column(column_in_file, file_path)
 
             self.import_one_to_many(file_path, o2m_column_index, table, column_in_one2many_table)
+
+        log.info('done importing %s in %.2f', table.name, time.time() - table_import_timer)
 
     def import_one_to_many(self, file_path, column_index, parent_table, column_in_one2many_table):
         """
@@ -349,8 +350,11 @@ class DbManager(BaseDbManager):
         :return:
         """
         mapper = inspect(sqlalchemy_model)
-        dtypes = {x.key: alchemy_pandas_dytpe_mapper[type(x.type)] for x in mapper.columns if x.key != 'id'}
-        return dtypes
+        return {
+            x.key: alchemy_pandas_dytpe_mapper[type(x.type)]
+            for x in mapper.columns
+            if x.key != 'id'
+        }
 
     def import_table_in_db(self, file_path, use_columns_with_index, column_names_in_db, table):
         """Imports data from CTD file into database
@@ -396,8 +400,7 @@ class DbManager(BaseDbManager):
     def get_column_names_from_file(file_path):
         """returns column names from CTD download file
 
-        :param file_path: path to CTD download file
-        :type: file_path: str
+        :param str file_path: path to CTD download file
         """
         if file_path.endswith('.gz'):
             file_handler = io.TextIOWrapper(io.BufferedReader(gzip.open(file_path)))
@@ -413,29 +416,32 @@ class DbManager(BaseDbManager):
                 elif fields_line and not (line == '' or line == '#'):
                     return [column.strip() for column in line[1:].split("\t")]
 
-    @staticmethod
-    def download_urls(urls, force_download=False):
-        """Downloads all CTD URLs if it not exists
+    @classmethod
+    def download_urls(cls, urls, force_download=False):
+        """Downloads all CTD URLs that don't exist
     
-        :param urls: iterable of URL of CTD
-        :type urls: iterable
-        :param force_download: force method to download
-        :type force_download: bool
+        :param iter[str] urls: iterable of URL of CTD
+        :param bool force_download: force method to download
         """
         for url in urls:
-            file_path = DbManager.get_path_to_file_from_url(url)
-            if force_download or not os.path.exists(file_path):
-                log.info('download {}'.format(file_path))
-                urlretrieve(url, file_path)
+            file_path = cls.get_path_to_file_from_url(url)
 
-    @staticmethod
-    def get_path_to_file_from_url(url):
+            if os.path.exists(file_path) and not force_download:
+                log.info('already downloaded %s to %s', url, file_path)
+            else:
+                log.info('downloading %s to %s', url, file_path)
+                download_timer = time.time()
+                urlretrieve(url, file_path)
+                log.info('downloaded in %.2f seconds', time.time() - download_timer)
+
+    @classmethod
+    def get_path_to_file_from_url(cls, url):
         """standard file path
         
         :param str url: CTD download URL 
         """
         file_name = urlparse(url).path.split('/')[-1]
-        return os.path.join(DbManager.pyctd_data_dir, file_name)
+        return os.path.join(cls.pyctd_data_dir, file_name)
 
 
 def update(connection=None, urls=None, force_download=False):
@@ -445,18 +451,17 @@ def update(connection=None, urls=None, force_download=False):
     :param str connection: custom database connection string
     :param bool force_download: force method to download
     """
-
     db = DbManager(connection)
-    db.db_import(urls, force_download)
+    db.db_import(urls=urls, force_download=force_download)
     db.session.close()
 
 
-def set_mysql_connection(host='localhost', user='pyctd_user', passwd='pyctd_passwd', db='pyctd', charset='utf8'):
+def set_mysql_connection(host='localhost', user='pyctd_user', password='pyctd_passwd', db='pyctd', charset='utf8'):
     """Sets the connection using MySQL Parameters"""
     set_connection('mysql+pymysql://{user}:{passwd}@{host}/{db}?charset={charset}'.format(
         host=host,
         user=user,
-        passwd=passwd,
+        passwd=password,
         db=db,
         charset=charset)
     )
@@ -468,9 +473,9 @@ def set_test_connection():
 
 
 def set_connection(connection=defaults.sqlalchemy_connection_string_default):
-    """Set the connection string for sqlalchemy
+    """Set the connection string for SQLAlchemy
 
-    :param str connection: sqlalchemy connection string
+    :param str connection: SQLAlchemy connection string
     """
     cfp = defaults.config_file_path
     config = RawConfigParser()
@@ -479,7 +484,7 @@ def set_connection(connection=defaults.sqlalchemy_connection_string_default):
         with open(cfp, 'w') as config_file:
             config['database'] = {'sqlalchemy_connection_string': connection}
             config.write(config_file)
-            log.info('create configuration file {}'.format(cfp))
+            log.info('create configuration file %s', cfp)
     else:
         config.read(cfp)
         config.set('database', 'sqlalchemy_connection_string', connection)
