@@ -59,8 +59,7 @@ if not os.path.exists(test_data_folder):
     os.mkdir(test_data_folder)
 
 
-@staticmethod
-def download_urls(*args, **kwargs):
+def download_urls(cls, *args, **kwargs):
     """overwrites pyctd.manager.database.DbManager.download_urls in TestImport.setup"""
 
     file_names = [x['file_name'] for x in list(table_conf.tables.values())]
