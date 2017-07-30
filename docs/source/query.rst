@@ -11,7 +11,7 @@ Methods
 .. code-block:: python
 
     >>> import pyctd
-    >>> q = pyctd.query
+    >>> q = pyctd.query()
     >>> q.get_diseases(disease_id='MESH:D000544', definition='%degenerative%')
     >>> q.get_genes(gene_symbol='TSP_15922', uniprot_id='E5T972')
     >>> q.get_pathways(pathway_name='%bla')
@@ -24,7 +24,7 @@ Properties
 .. code-block:: python
 
     >>> import pyctd
-    >>> q = pyctd.query
+    >>> q = pyctd.query()
     >>> q.gene_forms
     >>> q.interaction_actions
     >>> q.actions

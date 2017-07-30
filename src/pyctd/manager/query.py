@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 
-from .database import BaseDbManager
-from . import models
-from sqlalchemy import distinct
 from pandas import read_sql
+from sqlalchemy import distinct
+
+from . import models
+from .database import BaseDbManager
 
 
 class QueryManager(BaseDbManager):
@@ -27,7 +28,8 @@ class QueryManager(BaseDbManager):
 
         return results
 
-    def _join_gene(self, query, gene_name, gene_symbol, gene_id):
+    @staticmethod
+    def _join_gene(query, gene_name, gene_symbol, gene_id):
         """helper function to add a query join to Gene model
 
         :param `sqlalchemy.orm.query.Query` query: SQL Alchemy query 
@@ -50,7 +52,8 @@ class QueryManager(BaseDbManager):
 
         return query
 
-    def _join_chemical(self, query, cas_rn, chemical_id, chemical_name, chemical_definition):
+    @staticmethod
+    def _join_chemical(query, cas_rn, chemical_id, chemical_name, chemical_definition):
         """helper function to add a query join to Chemical model
         
         :param `sqlalchemy.orm.query.Query` query: SQL Alchemy query 
@@ -77,14 +80,15 @@ class QueryManager(BaseDbManager):
 
         return query
 
-    def _join_disease(self, query, disease_definition, disease_id, disease_name):
+    @staticmethod
+    def _join_disease(query, disease_definition, disease_id, disease_name):
         """helper function to add a query join to Disease model
         
-        :param `sqlalchemy.orm.query.Query` query: SQL Alchemy query 
+        :param sqlalchemy.orm.query.Query query: SQL Alchemy query
         :param disease_definition: 
-        :param disease_id: 
+        :param str disease_id: see :attr:`models.Disease.disease_id`
         :param disease_name: 
-        :return: `sqlalchemy.orm.query.Query` object
+        :rtype: sqlalchemy.orm.query.Query
         """
         if disease_definition or disease_id or disease_name:
             query = query.join(models.Disease)
@@ -100,7 +104,8 @@ class QueryManager(BaseDbManager):
 
         return query
 
-    def _join_pathway(self, query, pathway_id, pathway_name):
+    @staticmethod
+    def _join_pathway(query, pathway_id, pathway_name):
         """helper function to add a query join to Pathway model
         
         :param `sqlalchemy.orm.query.Query` query: SQL Alchemy query  
@@ -182,18 +187,14 @@ class QueryManager(BaseDbManager):
         :param bool as_df: if set to True result returns as `pandas.DataFrame`
         :param alt_gene_id: 
         :param str gene_name: gene name
-        :param str gene_symbol: gene symbol
-        :param int gene_id: NCBI Gene identifier
+        :param str gene_symbol: HGNC gene symbol
+        :param int gene_id: NCBI Entrez Gene identifier
         :param str synonym: Synonym
         :param str uniprot_id: UniProt primary accession number
         :param str pharmgkb_id: PharmGKB identifier 
         :param int biogrid_id: BioGRID identifier
         :param int limit: maximum of results 
-        :return: list of :class:`pyctd.manager.models.Gene` objects
-
-        .. seealso::
-
-            :class:`pyctd.manager.models.Gene`
+        :rtype: list[models.Gene]
         """
         q = self.session.query(models.Gene)
 
@@ -304,8 +305,7 @@ class QueryManager(BaseDbManager):
                                           cas_rn=None, chemical_id=None, chemical_name=None, organism_id=None,
                                           interaction_sentence=None, chemical_definition=None,
                                           gene_form=None, interaction_action=None, as_df=False):
-        """
-        Get all interactions for chemicals on a gene or biological entity (linked to this gene). 
+        """Get all interactions for chemicals on a gene or biological entity (linked to this gene).
 
         Chemicals can interact on different types of biological entities linked to a gene. A list of allowed
         entities linked to a gene can be retrieved via the attribute :attr:`~.gene_forms`.
@@ -316,18 +316,18 @@ class QueryManager(BaseDbManager):
 
         :param bool as_df: if set to True result returns as `pandas.DataFrame`
         :param str interaction_sentence: sentence describing the interactions 
-        :param int organism_id: NCBI TaxTree identifier
+        :param int organism_id: NCBI TaxTree identifier. Example: 9606 for Human.
         :param str chemical_name: chemical name
         :param str chemical_id: chemical identifier
         :param str cas_rn: CAS registry number
         :param str chemical_definition:
-        :param str gene_symbol: gene symbol
+        :param str gene_symbol: HGNC gene symbol
         :param str gene_name: gene name
-        :param int gene_id: NCBI Gene identifier
+        :param int gene_id: NCBI Entrez Gene identifier
         :param str gene_form: gene form
         :param str interaction_action: combination of interaction and actions
         :param int limit: maximum number of results
-        :return: list of :class:`pyctd.manager.database.models.ChemGeneIxn` objects
+        :rtype: list[models.ChemGeneIxn]
 
 
         .. seealso::
