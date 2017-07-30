@@ -1,36 +1,34 @@
 # -*- coding: utf-8 -*-
+
 """PyCTD loads all CTD content in the database. Content is available via functions."""
 
-import sys
-if sys.version_info[0] == 3:
-    from urllib.request import urlretrieve
-    from requests.compat import urlparse
-else:
-    from urllib import urlretrieve
-    from urlparse import urlparse
-
-import logging
-import pandas as pd
-import io
-import gzip
 import configparser
-
-from ..constants import PYCTD_DATA_DIR, PYCTD_DIR
-
+import gzip
+import io
+import logging
 import os
 import re
+import sys
 from configparser import RawConfigParser
-from sqlalchemy import create_engine, inspect
-from sqlalchemy.orm import sessionmaker, scoped_session
-from sqlalchemy.engine import reflection
-from sqlalchemy.sql import sqltypes
+
 import numpy as np
+import pandas as pd
+from requests.compat import urlparse
+from sqlalchemy import create_engine, inspect
+from sqlalchemy.engine import reflection
+from sqlalchemy.orm import sessionmaker, scoped_session
+from sqlalchemy.sql import sqltypes
 
 from . import defaults
 from . import models
 from . import table_conf
 from .table import get_table_configurations
-from ..constants import bcolors
+from ..constants import PYCTD_DATA_DIR, PYCTD_DIR, bcolors
+
+if sys.version_info[0] == 3:
+    from urllib.request import urlretrieve
+else:
+    from urllib import urlretrieve
 
 log = logging.getLogger(__name__)
 
@@ -74,10 +72,10 @@ class BaseDbManager(object):
         :param bool echo: True or False for SQL output of SQLAlchemy engine
         """
         log.setLevel(logging.INFO)
-        
+
         handler = logging.FileHandler(os.path.join(PYCTD_DIR, defaults.TABLE_PREFIX + 'database.log'))
         handler.setLevel(logging.INFO)
-        
+
         formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
         handler.setFormatter(formatter)
         log.addHandler(handler)
@@ -119,7 +117,6 @@ class BaseDbManager(object):
         if not (user_connection or user_connection.strip()):
             user_connection = defaults.sqlalchemy_connection_string_default
         set_connection(user_connection.strip())
-
 
     def _create_tables(self, checkfirst=True):
         """creates all tables from models in your database
@@ -265,7 +262,7 @@ class DbManager(BaseDbManager):
                 columns_in_file_expected,
                 column_names_from_file,
                 file_path
-                )
+            )
             )
         else:
             for index, column in enumerate(column_names_from_file):
@@ -293,7 +290,6 @@ class DbManager(BaseDbManager):
         self.import_table_in_db(file_path, use_columns_with_index, column_names_in_db, table)
 
         for column_in_file, column_in_one2many_table in table.one_to_many:
-
             o2m_column_index = self.get_index_of_column(column_in_file, file_path)
 
             self.import_one_to_many(file_path, o2m_column_index, table, column_in_one2many_table)
@@ -340,12 +336,10 @@ class DbManager(BaseDbManager):
                 column_in_one2many_table: child_values
             }).to_sql(name=o2m_table_name, if_exists='append', con=self.engine, index=False)
 
-
-    def get_dtypes(self,sqlalchemy_model):
+    def get_dtypes(self, sqlalchemy_model):
         mapper = inspect(sqlalchemy_model)
         dtypes = {x.key: alchemy_pandas_dytpe_mapper[type(x.type)] for x in mapper.columns if x.key != 'id'}
         return dtypes
-
 
     def import_table_in_db(self, file_path, use_columns_with_index, column_names_in_db, table):
         """Imports data from CTD file into database
@@ -479,5 +473,3 @@ def set_connection(connection=defaults.sqlalchemy_connection_string_default):
         config.set('database', 'sqlalchemy_connection_string', connection)
         with open(cfp, 'w') as configfile:
             config.write(configfile)
-
-
