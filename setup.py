@@ -1,21 +1,24 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
-import sys
-import re
-import os
-from setuptools import setup, find_packages
 import codecs
+import os
+import re
+import sys
+
+from setuptools import setup, find_packages
 
 PACKAGES = find_packages(where='src')
 
-KEYWORDS = ['Toxicogenomics', 'Database', 'Bioinformatics', 'Human health' ]
+KEYWORDS = ['Toxicogenomics', 'Database', 'Bioinformatics', 'Human health']
 
 INSTALL_REQUIRES = [
-    'sqlalchemy',
     'pandas',
-    'pymysql',
+    'sqlalchemy',
     'requests',
     'click',
+    'pymysql',
+    'numpy',
 ]
 
 if sys.version_info < (3,):
@@ -34,6 +37,7 @@ def read(*parts):
     """Build an absolute path from *parts* and return the contents of the resulting file. Assume UTF-8 encoding."""
     with codecs.open(os.path.join(HERE, *parts), 'rb', 'utf-8') as f:
         return f.read()
+
 
 META_PATH = os.path.join('src', 'pyctd', '__init__.py')
 META_FILE = read(META_PATH)
@@ -55,6 +59,7 @@ def get_long_description():
     with codecs.open(os.path.join(HERE, 'README.rst'), encoding='utf-8') as f:
         long_description = f.read()
     return long_description
+
 
 setup(
     name=find_meta('title'),

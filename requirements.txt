@@ -1,6 +1,7 @@
 pandas
-configparser
 requests
 sqlalchemy
 click
 pymysql
+numpy
+configparser
