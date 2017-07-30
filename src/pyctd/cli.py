@@ -70,7 +70,7 @@ def set_mysql(host, user, password, db, charset):
 
 
 @main.command()
-def getcon():
+def get_connection():
     """Get the connection string"""
     click.echo(get_connection_string())
 
