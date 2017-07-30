@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-"""SQLAlchemy database models in this module describes all tables the database and 
+
+"""SQLAlchemy database models in this module describes all tables the database and
 fits the description in the table_conf module
 
 .. image:: _static/models/all.png

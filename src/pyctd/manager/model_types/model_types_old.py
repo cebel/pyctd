@@ -116,14 +116,13 @@ action = (
 
 ontology = ('Biological Process', 'Cellular Component', 'Molecular Function')
 
-interaction = ('increases',  'affects', 'decreases')
+interaction = ('increases', 'affects', 'decreases')
 
 direct_evidence = ('marker/mechanism', 'marker/mechanism|therapeutic', 'therapeutic')
-
 
 outcome_relationship = (
     'negative correlation',
     'no correlation',
     'positive correlation',
     'prediction/hypothesis'
-    ) 
+)

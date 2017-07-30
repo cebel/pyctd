@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 parentcode = ('clv', 'deg', 'gly', 'lip', 'met', 'rib', 'sec', 'trt', 'upt')
 
 typename = (
@@ -111,4 +113,3 @@ code = (
     'upt',
     'w'
 )
-

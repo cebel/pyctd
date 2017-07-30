@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 
-"""
-This file contains a listing of the default CTD URLs.
-"""
+"""This file contains a listing of the default CTD URLs."""
+
 import os
 
 from ..constants import PYCTD_DIR, PYCTD_DATA_DIR
