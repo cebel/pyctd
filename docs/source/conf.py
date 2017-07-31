@@ -62,7 +62,7 @@ author = 'Christian Ebeling'
 # built documents.
 #
 # The full version, including alpha/beta/rc tags.
-release = '0.5.8'
+release = '0.5.9-dev'
 
 # The short X.Y version.
 parsed_version = re.match(
