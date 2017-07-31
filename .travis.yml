@@ -1,27 +1,31 @@
 sudo: false
 cache: pip
-
 language: python
-
 python:
-    - 3.6
-    - 2.7
-
+- 3.6
+- 2.7
 env:
-    matrix:
-      - TOXENV=py
-      - TOXENV=docs
-
+  matrix:
+  - TOXENV=py
+  - TOXENV=docs
 matrix:
-    include:
-        - python: 3.6
-          env: TOXENV=manifest
-    allow_failures:
-        - python: 2.7
-
+  include:
+  - python: 3.6
+    env: TOXENV=manifest
+  allow_failures:
+  - python: 2.7
 install:
-    - pip install tox
-    - pip install codecov
-
+- pip install tox
+- pip install codecov
 script:
-    - tox
+- tox
+deploy:
+  provider: pypi
+  user: Christian_Ebeling
+  password:
+    secure: LeMb1csLlWQGIZqPeXLW3ikVEZ3uJ5G3CO9Zu364MVmModrR9o2c23xvQ1KrjZOycphHKHK27ZiBlxMoRQed/vtDa2WZdfaFujojAlcteFW06gcIlPJxbqBaJs6gDdoQqEsgyPgCN976L64eQoQRe7z/biuZDqGL4BDV+4s66i0GBQnNeTDybV6e2mm5DZ77ncovmsbzogkbZVMxB61u7QCJ6AmFCLQsH5iuLdEtmlTKV81DoVqPFP0fKYpr9vu/0jM4CwZs8ZGh8eYnR1TAiLBVcCbVVaqWR8TJ8otpI40Ki0M/rF9fiRh0OB/ZHuun19y6guqHlu0Uz5L28XhFtYshF1em6nrgo6bkGQUeHK/1mpHA3ixjocPpBxpUpOxfY/8SCX/2w+xYOL0ysNmrmagoIKU70sKfuECQIe0w24vNVGCPK5JUWr4SffK39hYofy9+RqrlIshkddCEvJW5WQa7iEOmYOyvvOwX4lcQzn6Gck8XFadRtZam6yOb0yX7ZCdg2nQScT5BgIvptwF5hKjnlR1OupuENNUsBzgKU5N+KxTtC+G0OF17VMK5sGgec3ku0cvkzX2JQUfnScJEakho7yiOVZa5Z5wWo4SFJmiw0IB4QkCWe0gwDwy2VIyTZwNCEih4E19xxPYU1JjstGBGFa8UXCbuZ/OWkRFAuVU=
+  on:
+    tags: true
+    distributions: "sdist bdist_wheel"
+    repo: cebel/pyctd
+    branch: master
