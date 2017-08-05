@@ -4,7 +4,8 @@ Query
 Examples
 --------
 For most of the string parameters you can use % as wildcard (please check the documentation below). All methods
-have a parameter ``limit`` which allows to limit the number of results.
+have a parameter ``limit`` which allows to limit the number of results and ``as_df`` which allows to return
+a `pandas.DataFrame`.
 
 Methods
 ~~~~~~~
