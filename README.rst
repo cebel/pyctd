@@ -3,6 +3,8 @@ PyCTD |stable_build|
 
 |stable_documentation| |pypi_license|
 
+|project_logo_large|
+
 `PyCTD <http://pyctd.readthedocs.io>`_ is a Python package
 to access and query chemical–gene/protein interactions, chemical–disease and gene–disease
 relationships by data provided by the `Comparative Toxicogenomics Database <http://ctdbase.org>`_ .
@@ -199,4 +201,8 @@ PyCTD
 
 .. |er_model| image:: https://raw.githubusercontent.com/cebel/pyctd/master/docs/source/_static/models/all.png
     :target: http://pyctd.readthedocs.io/en/latest/
+    :alt: Entity relationship model
+    
+.. |project_logo_large| image:: https://raw.githubusercontent.com/cebel/pyctd/master/docs/source/_static/logos/project_logo_large.png
+
     :alt: Entity relationship model
