@@ -1,9 +1,10 @@
+|project_logo_large|
+
 PyCTD |stable_build|
 ====================
 
 |stable_documentation| |pypi_license|
 
-|project_logo_large|
 
 `PyCTD <http://pyctd.readthedocs.io>`_ is a Python package
 to access and query chemical–gene/protein interactions, chemical–disease and gene–disease
