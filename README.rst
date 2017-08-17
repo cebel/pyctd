@@ -204,5 +204,4 @@ PyCTD
     :alt: Entity relationship model
     
 .. |project_logo_large| image:: https://raw.githubusercontent.com/cebel/pyctd/master/docs/source/_static/logos/project_logo_large.png
-
-    :alt: Entity relationship model
+    :alt: Project logo
