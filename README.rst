@@ -3,6 +3,8 @@ PyCTD |stable_build|
 
 |stable_documentation| |pypi_license|
 
+|project_logo_large|
+
 `PyCTD <http://pyctd.readthedocs.io>`_ is a Python package
 to access and query chemical–gene/protein interactions, chemical–disease and gene–disease
 relationships by data provided by the `Comparative Toxicogenomics Database <http://ctdbase.org>`_ .
@@ -181,22 +183,26 @@ PyCTD
 .. |pypi_version| image:: https://img.shields.io/pypi/v/PyCTD.svg
     :alt: Current version on PyPI
 
-.. |phago_logo| image:: https://owncloud.scai.fraunhofer.de/index.php/apps/files_sharing/ajax/publicpreview.php?x=1920&y=562&a=true&file=phago-logo.jpg&t=7llp11KwSiuXYOh&scalingup=0
+.. |phago_logo| image:: https://raw.githubusercontent.com/cebel/pyctd/master/docs/source/_static/logos/phago_logo.jpeg
     :target: https://www.imi.europa.eu/content/phago
     :alt: PHAGO project logo
 
-.. |aetionomy_logo| image:: https://owncloud.scai.fraunhofer.de/index.php/apps/files_sharing/ajax/publicpreview.php?x=1920&y=562&a=true&file=aetionomy-logo.png&t=5ClUGTZRAYkeb7m&scalingup=0
+.. |aetionomy_logo| image:: https://raw.githubusercontent.com/cebel/pyctd/master/docs/source/_static/logos/aetionomy_logo.png
     :target: http://www.aetionomy.eu/en/vision.html
     :alt: AETIONOMY project logo
 
-.. |imi_logo| image:: https://owncloud.scai.fraunhofer.de/index.php/apps/files_sharing/ajax/publicpreview.php?x=1920&y=562&a=true&file=imi-logo.png&t=Uvw79bTxGyd07oo&scalingup=0
+.. |imi_logo| image:: https://raw.githubusercontent.com/cebel/pyctd/master/docs/source/_static/logos/imi_logo.png
     :target: https://www.imi.europa.eu/
     :alt: IMI project logo
 
-.. |scai_logo| image:: https://owncloud.scai.fraunhofer.de/index.php/apps/files_sharing/ajax/publicpreview.php?x=1920&y=562&a=true&file=scai-logo.png&t=fyJo2GzFDLNypho&scalingup=0
+.. |scai_logo| image:: https://raw.githubusercontent.com/cebel/pyctd/master/docs/source/_static/logos/scai_logo.png
     :target: https://www.scai.fraunhofer.de/en/business-research-areas/bioinformatics.html
     :alt: SCAI project logo
 
 .. |er_model| image:: https://raw.githubusercontent.com/cebel/pyctd/master/docs/source/_static/models/all.png
     :target: http://pyctd.readthedocs.io/en/latest/
+    :alt: Entity relationship model
+    
+.. |project_logo_large| image:: https://raw.githubusercontent.com/cebel/pyctd/master/docs/source/_static/logos/project_logo_large.png
+
     :alt: Entity relationship model
