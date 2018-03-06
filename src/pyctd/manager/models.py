@@ -9,7 +9,7 @@ fits the description in the table_conf module
 
 from sqlalchemy import Column, ForeignKey, Integer, String, Text, REAL
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import backref, relationship
 
 from .defaults import TABLE_PREFIX
 
@@ -492,8 +492,8 @@ class ChemGeneIxn(Base):
     chemical__id = foreign_key_to('chemical')
     gene__id = foreign_key_to('gene')
 
-    chemical = relationship('Chemical')
-    gene = relationship('Gene')
+    chemical = relationship('Chemical', backref=backref('gene_interactions', lazy='dynamic'))
+    gene = relationship('Gene', backref=backref('chemical_interactions', lazy='dynamic'))
 
     gene_forms = relationship('ChemGeneIxnGeneForm')
     interaction_actions = relationship('ChemGeneIxnInteractionAction')
