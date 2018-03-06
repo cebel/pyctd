@@ -74,8 +74,8 @@ class Chemical(Base):
     id = Column(Integer, primary_key=True)
 
     chemical_name = Column(String(255), index=True)
-    chemical_id = Column(String(255), index=True)
-    cas_rn = Column(String(255), index=True)
+    chemical_id = Column(String(255), index=True, doc='MeSH identifier')
+    cas_rn = Column(String(255), index=True, doc='CAS Registry Number, if available')
     definition = Column(Text)
     inchi = Column(Text)
     isomeric_smiles = Column(Text)
