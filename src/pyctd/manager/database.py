@@ -295,7 +295,7 @@ class DbManager(BaseDbManager):
 
             self.import_one_to_many(file_path, o2m_column_index, table, column_in_one2many_table)
 
-        log.info('done importing %s in %.2f', table.name, time.time() - table_import_timer)
+        log.info('done importing %s in %.2f seconds', table.name, time.time() - table_import_timer)
 
     def import_one_to_many(self, file_path, column_index, parent_table, column_in_one2many_table):
         """
