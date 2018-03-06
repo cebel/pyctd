@@ -38,7 +38,7 @@ class Pathway(Base):
     id = Column(Integer, primary_key=True)
 
     pathway_name = Column(String(255))
-    pathway_id = Column(String(255))
+    pathway_id = Column(String(255), doc='KEGG or REACTOME identifier')
 
     def __repr__(self):
         return self.pathway_name
@@ -180,7 +180,7 @@ class Disease(Base):
     id = Column(Integer, primary_key=True)
 
     disease_name = Column(String(255))  #: Disease name (str)
-    disease_id = Column(String(255))  #: MeSH or OMIM identifier (str)
+    disease_id = Column(String(255), doc='MeSH or OMIM identifier')
     definition = Column(Text)  #: definition of disease (str)
     parent_ids = Column(String(255))  # TODO: have to be normalized
     """identifiers of the parent terms; '|'-delimited list"""
@@ -271,7 +271,7 @@ class Gene(Base):
 
     gene_symbol = Column(String(255), index=True)  #: gene_symbol"""
     gene_name = Column(Text)  #: gene name
-    gene_id = Column(Integer)  #: NCBI Gene identifier
+    gene_id = Column(Integer, doc='Entrez Gene Identifier')  #: NCBI Gene identifier
 
     alt_gene_ids = relationship("GeneAltGeneId", back_populates="gene")  #: list of alternative NCBI Gene identifiers
     pharmgkb_ids = relationship("GenePharmgkb", back_populates="gene")  #: list of PharmGKB identifiers
@@ -487,7 +487,7 @@ class ChemGeneIxn(Base):
     __tablename__ = TABLE_PREFIX + table_suffix
     id = Column(Integer, primary_key=True)
 
-    organism_id = Column(Integer, index=True)
+    organism_id = Column(Integer, index=True, doc='NCBI Taxonomy Identifier')
     interaction = Column(Text)
     chemical__id = foreign_key_to('chemical')
     gene__id = foreign_key_to('gene')
@@ -569,8 +569,8 @@ class ChemGoEnriched(Base):
     id = Column(Integer, primary_key=True)
 
     ontology = Column(String(255))
-    go_term_name = Column(String(255))
-    go_term_id = Column(String(255))
+    go_term_name = Column(String(255), doc='GO Name')
+    go_term_id = Column(String(255), doc='GO Identifier')
     highest_go_level = Column(Integer)
     p_value = Column(REAL)
     corrected_p_value = Column(REAL)
