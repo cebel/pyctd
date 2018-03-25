@@ -162,8 +162,6 @@ class DbManager(BaseDbManager):
         
         :param iter[str] urls: An iterable of URL strings
         :param bool force_download: force method to download
-        :return: SQL Alchemy model instance, populated with data from URL
-        :rtype: :class:`models.Namespace`
         """
         if not urls:
             urls = [
@@ -187,7 +185,6 @@ class DbManager(BaseDbManager):
 
         - domain_id (represents the domain identifier of e.g. chemical)
         - domain__id (represents the primary key in domain table)
-
 
         :return: dict of pandas DataFrames (keys:domain_name, values:DataFrame)
         :rtype: dict of pandas.DataFrame
@@ -240,7 +237,7 @@ class DbManager(BaseDbManager):
         
         :param column: 
         :param file_path: 
-        :return: int or None
+        :return: Optional[int]
         """
         columns = cls.get_column_names_from_file(file_path)
         if column in columns:
@@ -253,7 +250,7 @@ class DbManager(BaseDbManager):
         :param columns_in_file_expected: 
         :param columns_dict: 
         :param file_path: 
-        :return: 
+        :rtype: tuple[list,list]
         """
         use_columns_with_index = []
         column_names_in_db = []
@@ -304,7 +301,6 @@ class DbManager(BaseDbManager):
         :param column_index: 
         :param parent_table:
         :param column_in_one2many_table: 
-        :return: 
         """
         chunks = pd.read_table(
             file_path,
@@ -345,7 +341,7 @@ class DbManager(BaseDbManager):
         """
 
         :param sqlalchemy_model:
-        :return:
+        :rtype: dict
         """
         mapper = inspect(sqlalchemy_model)
         return {
@@ -436,7 +432,8 @@ class DbManager(BaseDbManager):
     def get_path_to_file_from_url(cls, url):
         """standard file path
         
-        :param str url: CTD download URL 
+        :param str url: CTD download URL
+        :rtype: str
         """
         file_name = urlparse(url).path.split('/')[-1]
         return os.path.join(cls.pyctd_data_dir, file_name)
