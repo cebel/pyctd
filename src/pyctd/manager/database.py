@@ -87,7 +87,8 @@ class BaseDbManager(object):
             self.inspector = reflection.Inspector.from_engine(self.engine)
             self.sessionmaker = sessionmaker(bind=self.engine, autoflush=False, expire_on_commit=False)
             self.session = scoped_session(self.sessionmaker)()
-        except:
+        except Exception as e:
+            print(e)
             self.set_connection_string_by_user_input()
             self.__init__()
 
