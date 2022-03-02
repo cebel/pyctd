@@ -19,6 +19,7 @@ INSTALL_REQUIRES = [
     'click',
     'pymysql',
     'numpy',
+    'cryptography'
 ]
 
 if sys.version_info < (3,):
