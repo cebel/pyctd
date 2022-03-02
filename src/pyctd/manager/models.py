@@ -7,7 +7,7 @@ fits the description in the table_conf module
     :target: _images/all.png
 """
 
-from sqlalchemy import Column, ForeignKey, Integer, String, Text, REAL
+from sqlalchemy import Column, ForeignKey, Integer, BigInteger, String, Text, REAL
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import backref, relationship
 
@@ -632,16 +632,16 @@ class ExposureEvent(Base):
     stressor_source_details = Column(String(255))
     number_of_stressor_samples = Column(Integer)
     stress_or_notes = Column(String(255))
-    number_of_receptors = Column(Integer)
+    number_of_receptors = Column(BigInteger)
     receptors = Column(String(255))
-    receptor_notes = Column(String(255))
+    receptor_notes = Column(String(1000))
     smoking_status = Column(String(255))
     age = Column(String(255))
     age_units_of_measurement = Column(String(255))
     age_qualifier = Column(String(255))
     sex = Column(String(255))
     race = Column(String(255))
-    methods = Column(String(255))
+    methods = Column(String(1000))
     detection_limit = Column(Text)
     detection_limit_uom = Column(String(255))
     detection_frequency = Column(String(255))
