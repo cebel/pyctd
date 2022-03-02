@@ -24,6 +24,7 @@ from . import defaults
 from . import models
 from . import table_conf
 from .table import get_table_configurations
+from .table import Table
 from ..constants import PYCTD_DATA_DIR, PYCTD_DIR, bcolors
 
 if sys.version_info[0] == 3:
@@ -37,7 +38,8 @@ alchemy_pandas_dytpe_mapper = {
     sqltypes.Text: np.unicode,
     sqltypes.String: np.unicode,
     sqltypes.Integer: np.float,
-    sqltypes.REAL: np.double
+    sqltypes.REAL: np.double,
+    sqltypes.BigInteger: np.float
 }
 
 
@@ -295,7 +297,7 @@ class DbManager(BaseDbManager):
 
         log.info('done importing %s in %.2f seconds', table.name, time.time() - table_import_timer)
 
-    def import_one_to_many(self, file_path, column_index, parent_table, column_in_one2many_table):
+    def import_one_to_many(self, file_path: str, column_index: int, parent_table: Table, column_in_one2many_table):
         """
         
         :param file_path: 
