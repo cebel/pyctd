@@ -56,7 +56,6 @@ tables = OrderedDict([
         ),
         "domain_id_column": 'GeneID'
     }),
-
     (models.Chemical, {
         "file_name": 'CTD_chemicals.tsv.gz',
         "columns": [
@@ -71,7 +70,7 @@ tables = OrderedDict([
             ('TreeNumbers', 'tree_number'),
             ('ParentTreeNumbers', 'parent_tree_number'),
             ('Synonyms', 'synonym'),
-            ('DrugBankIDs', 'drugbank_id')
+            #('DrugBankIDs', 'drugbank_id')
         ),
     }),
 
