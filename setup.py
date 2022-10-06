@@ -19,6 +19,7 @@ INSTALL_REQUIRES = [
     'click',
     'pymysql',
     'numpy',
+    'pydantic'
 ]
 
 if sys.version_info < (3,):

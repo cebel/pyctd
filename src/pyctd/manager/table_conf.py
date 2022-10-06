@@ -1,14 +1,27 @@
-# -*- coding: utf-8 -*-
+ # -*- coding: utf-8 -*-
 
 import re
 from collections import OrderedDict
+from pydantic import BaseModel
+from typing import List, Tuple, Optional, Union
 
 from . import models
+
+class OneToManyConfig(BaseModel):
+    values_col: str
+    id_col: str
+
+class TableConfig(BaseModel):
+    file_name: str
+    columns: List[Union[str, Tuple[str,str]]]
+    domain_id_column: Optional[Union[str, Tuple[str,str]]]
+    one_to_many: Optional[Tuple[OneToManyConfig, ...]]
+
 
 id_re = re.compile("((IDs)|(ID)|([A-Z][a-z]+)|([A-Z]{2,}))")
 
 
-def standard_db_name(file_column_name):
+def standard_db_name(file_column_name: str) -> str:
     """return a standard name by following rules:
     1. find all regular expression partners ((IDs)|(ID)|([A-Z][a-z]+)|([A-Z]{2,}))
     2. lower very part and join again with _
@@ -31,53 +44,53 @@ models_to_map = (models.Chemical, models.Pathway, models.Gene, models.Disease)
 # ALERT: All strings in 'columns' and 'domain_id_column' will be translate by def standard_db_name into
 # (column_name_in_file, standard_column_name_in_db)
 tables = OrderedDict([
-    (models.Pathway, {
-        "file_name": 'CTD_pathways.tsv.gz',
-        "columns": [
+    (models.Pathway, TableConfig(
+        file_name= 'CTD_pathways.tsv.gz',
+        columns= [
             'PathwayName',
             'PathwayID',
         ],
-        "domain_id_column": 'PathwayID'
-    }),
+        one_to_many=None,
+        domain_id_column= 'PathwayID'
+    )),
 
-    (models.Gene, {
-        "file_name": 'CTD_genes.tsv.gz',
-        "columns": [
+    (models.Gene, TableConfig(
+        file_name= 'CTD_genes.tsv.gz',
+        columns= [
             'GeneSymbol',
             'GeneName',
             'GeneID'
         ],
-        "one_to_many": (
-            ('AltGeneIDs', 'alt_gene_id'),
-            ('Synonyms', 'synonym'),
-            ('BioGRIDIDs', 'biogrid_id'),
-            ('PharmGKBIDs', 'pharmgkb_id'),
-            ('UniProtIDs', 'uniprot_id')
+        one_to_many= (
+            OneToManyConfig(values_col='AltGeneIDs', id_col='alt_gene_id'),
+            OneToManyConfig(values_col='Synonyms', id_col='synonym'),
+            OneToManyConfig(values_col='BioGRIDIDs', id_col='biogrid_id'),
+            OneToManyConfig(values_col='PharmGKBIDs', id_col='pharmgkb_id'),
+            OneToManyConfig(values_col='UniProtIDs', id_col='uniprot_id')
         ),
-        "domain_id_column": 'GeneID'
-    }),
+        domain_id_column= 'GeneID'
+    )),
 
-    (models.Chemical, {
-        "file_name": 'CTD_chemicals.tsv.gz',
-        "columns": [
+    (models.Chemical, TableConfig(
+        file_name= 'CTD_chemicals.tsv.gz',
+        columns= [
             'ChemicalName',
             'ChemicalID',
             'CasRN',
             'Definition',
         ],
-        "domain_id_column": 'ChemicalID',
-        "one_to_many": (
-            ('ParentIDs', 'parent_id'),
-            ('TreeNumbers', 'tree_number'),
-            ('ParentTreeNumbers', 'parent_tree_number'),
-            ('Synonyms', 'synonym'),
-            ('DrugBankIDs', 'drugbank_id')
+        domain_id_column= 'ChemicalID',
+        one_to_many= (
+            OneToManyConfig(values_col='ParentIDs', id_col='parent_id'),
+            OneToManyConfig(values_col='TreeNumbers', id_col='tree_number'),
+            OneToManyConfig(values_col='ParentTreeNumbers', id_col='parent_tree_number'),
+            OneToManyConfig(values_col='Synonyms', id_col='synonym'),
         ),
-    }),
+    )),
 
-    (models.Disease, {
-        "file_name": 'CTD_diseases.tsv.gz',
-        "columns": [
+    (models.Disease, TableConfig(
+        file_name= 'CTD_diseases.tsv.gz',
+        columns= [
             'DiseaseName',
             'DiseaseID',
             'Definition',
@@ -85,17 +98,17 @@ tables = OrderedDict([
             'TreeNumbers',
             'ParentTreeNumbers'
         ],
-        "one_to_many": (
-            ("AltDiseaseIDs", 'alt_disease_id'),
-            ('Synonyms', 'synonym'),
-            ('SlimMappings', "slim_mapping")
+        one_to_many= (
+            OneToManyConfig(values_col="AltDiseaseIDs", id_col='alt_disease_id'),
+            OneToManyConfig(values_col='Synonyms', id_col='synonym'),
+            OneToManyConfig(values_col='SlimMappings', id_col="slim_mapping")
         ),
-        "domain_id_column": 'DiseaseID'
-    }),
+        domain_id_column= 'DiseaseID'
+    )),
 
-    (models.ExposureEvent, {
-        "file_name": 'CTD_exposure_events.tsv.gz',
-        "columns": [
+    (models.ExposureEvent, TableConfig(
+        file_name= 'CTD_exposure_events.tsv.gz',
+        columns= [
             # ('exposurestressorname', 'chemical_name'),
             ('exposurestressorid', 'chemical_id'),
             ('stressorsourcecategory', 'stressor_source_category'),
@@ -139,29 +152,35 @@ tables = OrderedDict([
             ('enrollmentstartyear', 'enrollment_start_year'),
             ('enrollmentendyear', 'enrollment_end_year'),
             ('studyfactors', 'study_factors')
-        ]
-    }),
+        ],
+        one_to_many=None,
+        domain_id_column=None
+    )),
 
-    (models.DiseasePathway, {
-        "file_name": 'CTD_diseases_pathways.tsv.gz',
-        "columns": [
+    (models.DiseasePathway, TableConfig(
+        file_name= 'CTD_diseases_pathways.tsv.gz',
+        columns= [
             'DiseaseID',
             'PathwayID',
             'InferenceGeneSymbol'
         ],
-    }),
+        domain_id_column=None,
+        one_to_many=None
+    )),
 
-    (models.GenePathway, {
-        "file_name": 'CTD_genes_pathways.tsv.gz',
-        "columns": [
+    (models.GenePathway, TableConfig(
+        file_name='CTD_genes_pathways.tsv.gz',
+        columns= [
             'GeneID',
             'PathwayID'
         ],
-    }),
+        domain_id_column=None,
+        one_to_many=None
+    )),
 
-    (models.ChemPathwayEnriched, {
-        "file_name": 'CTD_chem_pathways_enriched.tsv.gz',
-        "columns": [
+    (models.ChemPathwayEnriched, TableConfig(
+        file_name='CTD_chem_pathways_enriched.tsv.gz',
+        columns=[
             'ChemicalID',
             'PathwayID',
             ('PValue', 'p_value'),
@@ -171,11 +190,13 @@ tables = OrderedDict([
             'BackgroundMatchQty',
             'BackgroundTotalQty',
         ],
-    }),
+        domain_id_column=None,
+        one_to_many=None
+    )),
 
-    (models.ChemGoEnriched, {
-        "file_name": 'CTD_chem_go_enriched.tsv.gz',
-        "columns": [
+    (models.ChemGoEnriched, TableConfig(
+        file_name='CTD_chem_go_enriched.tsv.gz',
+        columns=[
             'ChemicalID',
             'Ontology',
             ('GOTermName', 'go_term_name'),
@@ -188,73 +209,80 @@ tables = OrderedDict([
             'BackgroundMatchQty',
             'BackgroundTotalQty'
         ],
-    }),
+        domain_id_column=None,
+        one_to_many=None
+    )),
 
-    (models.Action, {
-        "file_name": 'CTD_chem_gene_ixn_types.tsv',
-        "columns": [
+    (models.Action, TableConfig(
+        file_name='CTD_chem_gene_ixn_types.tsv',
+        columns=[
             'TypeName',
             'Code',
             'Description',
             'ParentCode'
-        ]
-    }),
+        ],
+        domain_id_column=None,
+        one_to_many=None
+    )),
 
-    (models.ChemGeneIxn, {
-        "file_name": 'CTD_chem_gene_ixns.tsv.gz',
-        "columns": [
+    (models.ChemGeneIxn, TableConfig(
+        file_name='CTD_chem_gene_ixns.tsv.gz',
+        columns=[
             'ChemicalID',
             'GeneID',
             'OrganismID',
             'Interaction',
         ],
-        "one_to_many": (
-            ('PubMedIDs', 'pubmed_id'),
-            ('InteractionActions', 'interaction_action'),
-            ('GeneForms', 'gene_form'),
-        )
-    }),
+        one_to_many=(
+            OneToManyConfig(values_col='PubMedIDs',id_col= 'pubmed_id'),
+            OneToManyConfig(values_col='InteractionActions', id_col='interaction_action'),
+            OneToManyConfig(values_col='GeneForms', id_col='gene_form'),
+        ),
+        domain_id_column=None
+    )),
 
-    (models.ChemicalDisease, {
-        "file_name": 'CTD_chemicals_diseases.tsv.gz',
-        "columns": [
+    (models.ChemicalDisease, TableConfig(
+        file_name= 'CTD_chemicals_diseases.tsv.gz',
+        columns= [
             'DirectEvidence',
             'InferenceGeneSymbol',
             'InferenceScore',
             'ChemicalID',
             'DiseaseID',
         ],
-        "one_to_many": (
-            ('PubMedIDs', 'pubmed_id'),
-            ('OmimIDs', 'omim_id'),
+        one_to_many= (
+            OneToManyConfig(values_col='PubMedIDs', id_col='pubmed_id'),
+            OneToManyConfig(values_col='OmimIDs', id_col='omim_id'),
         ),
-    }),
+        domain_id_column=None
+    )),
 
-    (models.GeneDisease, {
-        "file_name": 'CTD_genes_diseases.tsv.gz',
-        "columns": [
+    (models.GeneDisease, TableConfig(
+        file_name='CTD_genes_diseases.tsv.gz',
+        columns=[
             'GeneID',
             'DiseaseID',
             'DirectEvidence',
             'InferenceChemicalName',
             'InferenceScore',
         ],
-        "one_to_many": (
-            ('PubMedIDs', 'pubmed_id'),
-            ('OmimIDs', 'omim_id'),
+        one_to_many=(
+            OneToManyConfig(values_col='PubMedIDs', id_col='pubmed_id'),
+            OneToManyConfig(values_col='OmimIDs', id_col='omim_id'),
         ),
-    }),
+        domain_id_column=None
+    )),
 
 ])
 
 for model in tables:
 
-    tables[model]['columns'] = [
+    tables[model].columns = [
         (column, standard_db_name(column)) if isinstance(column, str) else column
-        for column in tables[model]['columns']
+        for column in tables[model].columns
     ]
 
-    if 'domain_id_column' in tables[model]:
-        d_id_col = tables[model]['domain_id_column']
+    if isinstance(tables[model].domain_id_column, str):
+        d_id_col = str(tables[model].domain_id_column)
         if isinstance(d_id_col, str):
-            tables[model]['domain_id_column'] = (d_id_col, standard_db_name(d_id_col))
+            tables[model].domain_id_column = (d_id_col, standard_db_name(d_id_col))

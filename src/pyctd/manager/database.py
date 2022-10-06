@@ -2,6 +2,7 @@
 
 """PyCTD loads all CTD content in the database. Content is available via functions."""
 
+from codecs import ignore_errors
 import configparser
 import gzip
 import io
@@ -11,6 +12,9 @@ import re
 import sys
 import time
 from configparser import RawConfigParser
+from .table import Table
+from typing import List, Dict
+from .table_conf import OneToManyConfig
 
 import numpy as np
 import pandas as pd
@@ -34,10 +38,11 @@ else:
 log = logging.getLogger(__name__)
 
 alchemy_pandas_dytpe_mapper = {
-    sqltypes.Text: np.unicode,
-    sqltypes.String: np.unicode,
-    sqltypes.Integer: np.float,
-    sqltypes.REAL: np.double
+    sqltypes.Text: np.unicode_,
+    sqltypes.String: np.unicode_,
+    sqltypes.Integer: np.float64,
+    sqltypes.REAL: np.double,
+    sqltypes.BigInteger: 'Int64',
 }
 
 
@@ -58,7 +63,8 @@ def get_connection_string(connection=None):
         else:
             with open(cfp, 'w') as config_file:
                 connection = defaults.sqlalchemy_connection_string_default
-                config['database'] = {'sqlalchemy_connection_string': connection}
+                config['database'] = {
+                    'sqlalchemy_connection_string': connection}
                 config.write(config_file)
                 log.info('create configuration file %s', cfp)
 
@@ -74,10 +80,12 @@ class BaseDbManager(object):
         :param bool echo: True or False for SQL output of SQLAlchemy engine
         """
         log.setLevel(logging.INFO)
-        handler = logging.FileHandler(os.path.join(PYCTD_DIR, defaults.TABLE_PREFIX + 'database.log'))
+        handler = logging.FileHandler(os.path.join(
+            PYCTD_DIR, defaults.TABLE_PREFIX + 'database.log'))
         handler.setLevel(logging.INFO)
 
-        formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+        formatter = logging.Formatter(
+            '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
         handler.setFormatter(formatter)
         log.addHandler(handler)
 
@@ -85,7 +93,8 @@ class BaseDbManager(object):
             self.connection = get_connection_string(connection)
             self.engine = create_engine(self.connection, echo=echo)
             self.inspector = reflection.Inspector.from_engine(self.engine)
-            self.sessionmaker = sessionmaker(bind=self.engine, autoflush=False, expire_on_commit=False)
+            self.sessionmaker = sessionmaker(
+                bind=self.engine, autoflush=False, expire_on_commit=False)
             self.session = scoped_session(self.sessionmaker)()
         except:
             self.set_connection_string_by_user_input()
@@ -114,7 +123,8 @@ class BaseDbManager(object):
             bcolors.OKGREEN + "\tsqlite:///C:\\path\\to\\database.db\n" + bcolors.ENDC +
             "Oracle:\n" +
             bcolors.OKGREEN + "\toracle://user:passwd@127.0.0.1:1521/database\n\n" + bcolors.ENDC +
-            "[RETURN] for standard connection {}:\n".format(defaults.sqlalchemy_connection_string_default)
+            "[RETURN] for standard connection {}:\n".format(
+                defaults.sqlalchemy_connection_string_default)
         )
         if not (user_connection or user_connection.strip()):
             user_connection = defaults.sqlalchemy_connection_string_default
@@ -122,7 +132,7 @@ class BaseDbManager(object):
 
     def create_all(self, checkfirst=True):
         """Creates all tables from models in the database
-        
+
         :param bool checkfirst: Check if tables already exists
         """
         log.info('creating tables in %s', self.engine.url)
@@ -150,22 +160,22 @@ class DbManager(BaseDbManager):
         :param str connection: custom database connection SQL Alchemy string
         """
         super(DbManager, self).__init__(connection=connection)
-        self.tables = get_table_configurations()
+        self.tables: List[Table] = get_table_configurations()
 
     def db_import(self, urls=None, force_download=False):
         """Updates the CTD database
-        
+
         1. downloads all files from CTD
         2. drops all tables in database
         3. creates all tables in database
         4. import all data from CTD files
-        
+
         :param iter[str] urls: An iterable of URL strings
         :param bool force_download: force method to download
         """
         if not urls:
             urls = [
-                defaults.url_base + table_conf.tables[model]['file_name']
+                defaults.url_base + table_conf.tables[model].file_name
                 for model in table_conf.tables
             ]
 
@@ -180,7 +190,7 @@ class DbManager(BaseDbManager):
     @property
     def mapper(self):
         """returns a dictionary with keys of pyctd.manager.table_con.domains_to_map and pandas.DataFrame as values. 
-        
+
         DataFrames column names:
 
         - domain_id (represents the domain identifier of e.g. chemical)
@@ -194,24 +204,29 @@ class DbManager(BaseDbManager):
                 domain = model.table_suffix
                 tab_conf = table_conf.tables[model]
 
-                file_path = os.path.join(self.pyctd_data_dir, tab_conf['file_name'])
+                file_path = os.path.join(
+                    self.pyctd_data_dir, tab_conf.file_name)
 
-                col_name_in_file, col_name_in_db = tab_conf['domain_id_column']
+                col_name_in_file, col_name_in_db = tab_conf.domain_id_column if isinstance(
+                    tab_conf.domain_id_column, tuple) else ('', '')
 
-                column_index = self.get_index_of_column(col_name_in_file, file_path)
+                column_index = self.get_index_of_column(
+                    col_name_in_file, file_path)
 
-                df = pd.read_table(
+                df = pd.read_csv(
                     file_path,
                     names=[col_name_in_db],
                     header=None,
                     usecols=[column_index],
                     comment='#',
                     index_col=False,
-                    dtype=self.get_dtypes(model)
+                    dtype=self.get_dtypes(model),
+                    sep="\t"
                 )
 
                 if domain == 'chemical':
-                    df[col_name_in_db] = df[col_name_in_db].str.replace('MESH:', '').str.strip()
+                    df[col_name_in_db] = df[col_name_in_db].str.replace(
+                        'MESH:', '').str.strip()
 
                 df[domain + '__id'] = df.index + 1
                 self.__mapper[domain] = df
@@ -234,7 +249,7 @@ class DbManager(BaseDbManager):
     @classmethod
     def get_index_of_column(cls, column, file_path):
         """Get index of a specific column name in a CTD file
-        
+
         :param column: 
         :param file_path: 
         :return: Optional[int]
@@ -244,9 +259,9 @@ class DbManager(BaseDbManager):
             return columns.index(column)
 
     @classmethod
-    def get_index_and_columns_order(cls, columns_in_file_expected, columns_dict, file_path):
+    def get_index_and_columns_order(cls, columns_in_file_expected: List[str], columns_dict: Dict[str, str], file_path: str):
         """
-        
+
         :param columns_in_file_expected: 
         :param columns_dict: 
         :param file_path: 
@@ -256,6 +271,7 @@ class DbManager(BaseDbManager):
         column_names_in_db = []
 
         column_names_from_file = cls.get_column_names_from_file(file_path)
+        print('column_names_from_file:\t',column_names_from_file)
         if not set(columns_in_file_expected).issubset(column_names_from_file):
             log.exception(
                 '%s columns are not a subset of columns %s in file %s',
@@ -270,46 +286,46 @@ class DbManager(BaseDbManager):
                     column_names_in_db.append(columns_dict[column])
         return use_columns_with_index, column_names_in_db
 
-    def import_table(self, table):
+    def import_table(self, table: Table):
         """import table by Table object
-        
+
         :param `manager.table_conf.Table` table: Table object
         """
         file_path = os.path.join(self.pyctd_data_dir, table.file_name)
         log.info('importing %s data into table %s', file_path, table.name)
         table_import_timer = time.time()
 
-        use_columns_with_index, column_names_in_db = self.get_index_and_columns_order(
-            table.columns_in_file_expected,
-            table.columns_dict,
-            file_path
-        )
+        self.import_table_in_db(file_path, table)
 
-        self.import_table_in_db(file_path, use_columns_with_index, column_names_in_db, table)
+        for one_to_many_config in table.one_to_many:
+            o2m_column_index = self.get_index_of_column(
+                one_to_many_config.values_col, file_path)
 
-        for column_in_file, column_in_one2many_table in table.one_to_many:
-            o2m_column_index = self.get_index_of_column(column_in_file, file_path)
+            if o2m_column_index:
 
-            self.import_one_to_many(file_path, o2m_column_index, table, column_in_one2many_table)
+                self.import_one_to_many(
+                    file_path, o2m_column_index, table, one_to_many_config.id_col)
 
-        log.info('done importing %s in %.2f seconds', table.name, time.time() - table_import_timer)
+        log.info('done importing %s in %.2f seconds',
+                 table.name, time.time() - table_import_timer)
 
-    def import_one_to_many(self, file_path, column_index, parent_table, column_in_one2many_table):
+    def import_one_to_many(self, file_path, o2m_column_index, parent_table, column_in_one2many_table):
         """
-        
+
         :param file_path: 
         :param column_index: 
         :param parent_table:
         :param column_in_one2many_table: 
         """
-        chunks = pd.read_table(
+        chunks = pd.read_csv(
             file_path,
-            usecols=[column_index],
+            usecols=[o2m_column_index],
             header=None,
             comment='#',
             index_col=False,
             chunksize=1000000,
-            dtype=self.get_dtypes(parent_table.model)
+            dtype=self.get_dtypes(parent_table.model),
+            sep="\t"
         )
 
         for chunk in chunks:
@@ -320,7 +336,7 @@ class DbManager(BaseDbManager):
             chunk.index += 1
 
             for parent_id, values in chunk.iterrows():
-                entry = values[column_index]
+                entry = values[o2m_column_index]
                 if not isinstance(entry, str):
                     entry = str(entry)
                 for value in entry.split("|"):
@@ -328,7 +344,8 @@ class DbManager(BaseDbManager):
                     child_values.append(value.strip())
 
             parent_id_column_name = parent_table.name + '__id'
-            o2m_table_name = defaults.TABLE_PREFIX + parent_table.name + '__' + column_in_one2many_table
+            o2m_table_name = defaults.TABLE_PREFIX + \
+                parent_table.name + '__' + column_in_one2many_table
 
             pd.DataFrame({
                 parent_id_column_name: parent_id_values,
@@ -350,22 +367,31 @@ class DbManager(BaseDbManager):
             if x.key != 'id'
         }
 
-    def import_table_in_db(self, file_path, use_columns_with_index, column_names_in_db, table):
+    def import_table_in_db(self, file_path, table: Table):
         """Imports data from CTD file into database
-        
+
         :param str file_path: path to file
         :param list[int] use_columns_with_index: list of column indices in file
         :param list[str] column_names_in_db: list of column names (have to fit to models except domain_id column name)
         :param table: `manager.table.Table` object
         """
-        chunks = pd.read_table(
+        use_columns_with_index, column_names_in_db = self.get_index_and_columns_order(
+            table.columns_in_file_expected,
+            table.columns_dict,
+            file_path
+        )
+        dtype=self.get_dtypes(table.model)
+        print(use_columns_with_index, '\n', column_names_in_db,'\n', dtype)
+
+        chunks = pd.read_csv(
             file_path,
             usecols=use_columns_with_index,
             names=column_names_in_db,
             header=None, comment='#',
             index_col=False,
             chunksize=1000000,
-            dtype=self.get_dtypes(table.model)
+            dtype=dtype,
+            sep="\t"
         )
 
         for chunk in chunks:
@@ -380,24 +406,27 @@ class DbManager(BaseDbManager):
                     domain = model.table_suffix
                     domain_id = domain + "_id"
                     if domain_id in column_names_in_db:
-                        chunk = pd.merge(chunk, self.mapper[domain], on=domain_id, how='left')
+                        chunk = pd.merge(
+                            chunk, self.mapper[domain], on=domain_id, how='left')
                         del chunk[domain_id]
 
             chunk.set_index('id', inplace=True)
 
             table_with_prefix = defaults.TABLE_PREFIX + table.name
-            chunk.to_sql(name=table_with_prefix, if_exists='append', con=self.engine)
+            chunk.to_sql(name=table_with_prefix,
+                         if_exists='append', con=self.engine)
 
         del chunks
 
     @staticmethod
-    def get_column_names_from_file(file_path):
+    def get_column_names_from_file(file_path: str) -> List[str]:
         """returns column names from CTD download file
 
         :param str file_path: path to CTD download file
         """
         if file_path.endswith('.gz'):
-            file_handler = io.TextIOWrapper(io.BufferedReader(gzip.open(file_path)))
+            file_handler = io.TextIOWrapper(
+                io.BufferedReader(gzip.open(file_path)))
         else:
             file_handler = open(file_path, 'r')
 
@@ -405,15 +434,16 @@ class DbManager(BaseDbManager):
         with file_handler as file:
             for line in file:
                 line = line.strip()
-                if not fields_line and re.search('#\s*Fields\s*:$', line):
+                if not fields_line and re.search(r'#\s*Fields\s*:$', line):
                     fields_line = True
                 elif fields_line and not (line == '' or line == '#'):
                     return [column.strip() for column in line[1:].split("\t")]
+        return []
 
     @classmethod
     def download_urls(cls, urls, force_download=False):
         """Downloads all CTD URLs that don't exist
-    
+
         :param iter[str] urls: iterable of URL of CTD
         :param bool force_download: force method to download
         """
@@ -426,12 +456,13 @@ class DbManager(BaseDbManager):
                 log.info('downloading %s to %s', url, file_path)
                 download_timer = time.time()
                 urlretrieve(url, file_path)
-                log.info('downloaded in %.2f seconds', time.time() - download_timer)
+                log.info('downloaded in %.2f seconds',
+                         time.time() - download_timer)
 
     @classmethod
     def get_path_to_file_from_url(cls, url):
         """standard file path
-        
+
         :param str url: CTD download URL
         :rtype: str
         """
