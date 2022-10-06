@@ -28,6 +28,7 @@ from . import defaults
 from . import models
 from . import table_conf
 from .table import get_table_configurations
+from .table import Table
 from ..constants import PYCTD_DATA_DIR, PYCTD_DIR, bcolors
 
 if sys.version_info[0] == 3:
@@ -96,7 +97,8 @@ class BaseDbManager(object):
             self.sessionmaker = sessionmaker(
                 bind=self.engine, autoflush=False, expire_on_commit=False)
             self.session = scoped_session(self.sessionmaker)()
-        except:
+        except Exception as e:
+            print(e)
             self.set_connection_string_by_user_input()
             self.__init__()
 

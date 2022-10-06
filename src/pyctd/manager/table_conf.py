@@ -68,23 +68,41 @@ tables = OrderedDict([
             OneToManyConfig(values_col='PharmGKBIDs', id_col='pharmgkb_id'),
             OneToManyConfig(values_col='UniProtIDs', id_col='uniprot_id')
         ),
+<<<<<<< HEAD
         domain_id_column= 'GeneID'
     )),
 
     (models.Chemical, TableConfig(
         file_name= 'CTD_chemicals.tsv.gz',
         columns= [
+=======
+        "domain_id_column": 'GeneID'
+    }),
+    (models.Chemical, {
+        "file_name": 'CTD_chemicals.tsv.gz',
+        "columns": [
+>>>>>>> c9180255fb28d233b9e4f4292e66ad47488fbe50
             'ChemicalName',
             'ChemicalID',
             'CasRN',
             'Definition',
         ],
+<<<<<<< HEAD
         domain_id_column= 'ChemicalID',
         one_to_many= (
             OneToManyConfig(values_col='ParentIDs', id_col='parent_id'),
             OneToManyConfig(values_col='TreeNumbers', id_col='tree_number'),
             OneToManyConfig(values_col='ParentTreeNumbers', id_col='parent_tree_number'),
             OneToManyConfig(values_col='Synonyms', id_col='synonym'),
+=======
+        "domain_id_column": 'ChemicalID',
+        "one_to_many": (
+            ('ParentIDs', 'parent_id'),
+            ('TreeNumbers', 'tree_number'),
+            ('ParentTreeNumbers', 'parent_tree_number'),
+            ('Synonyms', 'synonym'),
+            #('DrugBankIDs', 'drugbank_id')
+>>>>>>> c9180255fb28d233b9e4f4292e66ad47488fbe50
         ),
     )),
 

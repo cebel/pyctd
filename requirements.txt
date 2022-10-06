@@ -5,3 +5,4 @@ click
 pymysql
 numpy
 configparser
+cryptography

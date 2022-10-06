@@ -20,6 +20,7 @@ INSTALL_REQUIRES = [
     'pymysql',
     'numpy',
     'pydantic'
+    'cryptography'
 ]
 
 if sys.version_info < (3,):
