@@ -19,7 +19,7 @@ INSTALL_REQUIRES = [
     'click',
     'pymysql',
     'numpy',
-    'pydantic'
+    'pydantic',
     'cryptography'
 ]
 
