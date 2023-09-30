@@ -21,12 +21,11 @@ import pandas as pd
 from requests.compat import urlparse
 from sqlalchemy import create_engine, inspect
 from sqlalchemy.engine import reflection
-from sqlalchemy.orm import sessionmaker, scoped_session
+from sqlalchemy.orm import scoped_session, sessionmaker
 from sqlalchemy.sql import sqltypes
+from tqdm import tqdm
 
-from . import defaults
-from . import models
-from . import table_conf
+from . import defaults, models, table_conf
 from .table import get_table_configurations
 from .table import Table
 from ..constants import PYCTD_DATA_DIR, PYCTD_DIR, bcolors
@@ -242,10 +241,13 @@ class DbManager(BaseDbManager):
         """
         for table in self.tables:
             if only_tables is not None and table.name not in only_tables:
+                log.debug('skipping table: %s', table)
                 continue
 
             if exclude_tables is not None and table.name in exclude_tables:
+                log.debug('skipping table: %s', table)
                 continue
+
             self.import_table(table)
 
     @classmethod
@@ -396,7 +398,7 @@ class DbManager(BaseDbManager):
             sep="\t"
         )
 
-        for chunk in chunks:
+        for chunk in tqdm(chunks):
             # this is an evil hack because CTD is not using the MESH prefix in this table
             if table.name == 'exposure_event':
                 chunk.disease_id = 'MESH:' + chunk.disease_id
@@ -449,6 +451,7 @@ class DbManager(BaseDbManager):
         :param iter[str] urls: iterable of URL of CTD
         :param bool force_download: force method to download
         """
+        log.info('downloading CTD data')
         for url in urls:
             file_path = cls.get_path_to_file_from_url(url)
 
